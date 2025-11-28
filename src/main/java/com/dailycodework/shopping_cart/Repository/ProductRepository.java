@@ -1,12 +1,12 @@
 package com.dailycodework.shopping_cart.Repository;
 
-import com.dailycodework.shopping_cart.DTO.Request.ProductUpdateRequest;
+import com.dailycodework.shopping_cart.DTO.Response.ProductResponse;
 import com.dailycodework.shopping_cart.Entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -22,4 +22,8 @@ public interface ProductRepository extends JpaRepository<Product,Long>, JpaSpeci
     List<Product> findByBrandAndName(String brand, String name);
     Long countByBrandAndName(String brand, String name);
     Page<Product> findByPriceBetween(BigDecimal min, BigDecimal max, Pageable pageable);
+    Long countByDiscountGreaterThan(BigDecimal value);
+    @Query("SELECT p FROM Product p ORDER BY p.createdAt DESC")
+    List<Product> findTop10ByOrderByCreatedAtDesc(Pageable pageable);
+
 }

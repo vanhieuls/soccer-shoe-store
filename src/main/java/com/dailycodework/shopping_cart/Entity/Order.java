@@ -4,6 +4,7 @@ import com.dailycodework.shopping_cart.Enum.OderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -30,6 +31,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     OderStatus oderStatus;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 50)
     Set<OrderItem> orderItems = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "user_id")

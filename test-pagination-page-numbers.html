@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Pagination Page Numbers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-title {
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .status.exists { background-color: #dcfce7; color: #166534; }
+        .status.issue { background-color: #fef3c7; color: #d97706; }
+        .pagination-demo {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            margin: 15px 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .demo-button {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            color: #374151;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            min-height: 32px;
+            min-width: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .demo-button:hover {
+            background-color: #e5e7eb;
+        }
+        .demo-button.active {
+            background-color: #2563eb;
+            color: white;
+            font-weight: 500;
+        }
+        .demo-button:disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+            background-color: #f9fafb;
+        }
+        .demo-button.prev-next {
+            padding: 4px 12px;
+        }
+        .code-block {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f9fafb;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Kiểm Tra Nút Số Trang - Pagination</h1>
+    
+    <div class="test-section">
+        <h2 class="test-title">📊 Phân Tích Hiện Trạng</h2>
+        
+        <div class="status exists">✅ Các nút số trang ĐÃ CÓ trong component Pagination!</div>
+        
+        <h3>🔍 Những gì đã được implement:</h3>
+        <ul>
+            <li>✅ <strong>Nút số trang:</strong> `visiblePages.map()` tạo các nút 1, 2, 3, 4...</li>
+            <li>✅ <strong>Highlight trang hiện tại:</strong> `bg-blue-600 text-white font-medium`</li>
+            <li>✅ <strong>Click chuyển trang:</strong> `onClick={() => onPageChange(page)}`</li>
+            <li>✅ <strong>Hiển thị thông minh:</strong> Logic `getVisiblePages()` với delta = 2</li>
+            <li>✅ <strong>Ellipsis:</strong> Dấu "..." cho các trang xa</li>
+            <li>✅ <strong>Trang đầu/cuối:</strong> Hiển thị trang 1 và trang cuối khi cần</li>
+        </ul>
+        
+        <div class="status issue">⚠️ Có thể vấn đề là styling hoặc visibility của các nút</div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🎨 Demo Pagination Hiện Tại</h2>
+        
+        <h3>Trang 1 (đầu):</h3>
+        <div class="pagination-demo">
+            <button class="demo-button prev-next" disabled>‹</button>
+            <button class="demo-button active">1</button>
+            <button class="demo-button">2</button>
+            <button class="demo-button">3</button>
+            <button class="demo-button">4</button>
+            <button class="demo-button">5</button>
+            <span style="color: #9ca3af;">...</span>
+            <button class="demo-button">10</button>
+            <button class="demo-button prev-next">›</button>
+        </div>
+        
+        <h3>Trang 3 (giữa):</h3>
+        <div class="pagination-demo">
+            <button class="demo-button prev-next">‹</button>
+            <button class="demo-button">1</button>
+            <span style="color: #9ca3af;">...</span>
+            <button class="demo-button">2</button>
+            <button class="demo-button active">3</button>
+            <button class="demo-button">4</button>
+            <button class="demo-button">5</button>
+            <span style="color: #9ca3af;">...</span>
+            <button class="demo-button">10</button>
+            <button class="demo-button prev-next">›</button>
+        </div>
+        
+        <h3>Trang 10 (cuối):</h3>
+        <div class="pagination-demo">
+            <button class="demo-button prev-next">‹</button>
+            <button class="demo-button">1</button>
+            <span style="color: #9ca3af;">...</span>
+            <button class="demo-button">6</button>
+            <button class="demo-button">7</button>
+            <button class="demo-button">8</button>
+            <button class="demo-button">9</button>
+            <button class="demo-button active">10</button>
+            <button class="demo-button prev-next" disabled>›</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🔧 Code Hiện Tại</h2>
+        
+        <h3>Logic tính toán trang hiển thị:</h3>
+        <div class="code-block">
+const getVisiblePages = () => {
+  const delta = 2; // Số trang hiển thị mỗi bên của trang hiện tại
+  const pages = [];
+  
+  let startPage = Math.max(1, currentPage - delta);
+  let endPage = Math.min(totalPages, currentPage + delta);
+  
+  // Đảm bảo luôn hiển thị ít nhất 5 trang nếu có thể
+  if (endPage - startPage + 1 < 5) {
+    if (startPage === 1) {
+      endPage = Math.min(5, totalPages);
+    } else if (endPage === totalPages) {
+      startPage = Math.max(1, totalPages - 4);
+    }
+  }
+  
+  // Tạo mảng số trang
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+  
+  return pages;
+};
+        </div>
+        
+        <h3>Render các nút số trang:</h3>
+        <div class="code-block">
+{/* Visible page buttons */}
+{visiblePages.map(page => (
+  &lt;button
+    key={page}
+    onClick={() => !loading && onPageChange(page)}
+    disabled={loading}
+    className={`px-3 py-1 rounded-md ${
+      currentPage === page
+        ? 'bg-blue-600 text-white font-medium'
+        : loading
+        ? 'text-gray-400 cursor-not-allowed'
+        : 'text-gray-700 hover:bg-gray-200'
+    }`}
+    aria-label={`Trang ${page}`}
+    aria-current={currentPage === page ? 'page' : undefined}
+  &gt;
+    {page}
+  &lt;/button&gt;
+))}
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">📊 So Sánh Với Trang Đơn Hàng</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Tính Năng</th>
+                    <th>Trang Đơn Hàng</th>
+                    <th>Trang Sản Phẩm</th>
+                    <th>Trạng Thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Nút số trang</td>
+                    <td>✅ pageNumbers.map()</td>
+                    <td>✅ visiblePages.map()</td>
+                    <td><span class="status exists">Có</span></td>
+                </tr>
+                <tr>
+                    <td>Highlight trang hiện tại</td>
+                    <td>bg-blue-600 text-white</td>
+                    <td>bg-blue-600 text-white font-medium</td>
+                    <td><span class="status exists">Tương tự</span></td>
+                </tr>
+                <tr>
+                    <td>Click handler</td>
+                    <td>handlePageChange(number)</td>
+                    <td>onPageChange(page)</td>
+                    <td><span class="status exists">Có</span></td>
+                </tr>
+                <tr>
+                    <td>Styling</td>
+                    <td>rounded px-3 py-1</td>
+                    <td>rounded-md px-3 py-1</td>
+                    <td><span class="status exists">Tương tự</span></td>
+                </tr>
+                <tr>
+                    <td>Hover effects</td>
+                    <td>hover:bg-blue-50</td>
+                    <td>hover:bg-gray-200</td>
+                    <td><span class="status issue">Khác nhau</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🎯 Vấn Đề Có Thể Gặp</h2>
+        
+        <h3>🔍 Các nguyên nhân có thể:</h3>
+        <ol>
+            <li><strong>Dữ liệu pagination:</strong> totalPages = 0 hoặc 1 → không hiển thị</li>
+            <li><strong>CSS conflicts:</strong> Styling bị override bởi CSS khác</li>
+            <li><strong>Loading state:</strong> Nút bị disabled do loading = true</li>
+            <li><strong>Props không đúng:</strong> onPageChange không được truyền đúng</li>
+            <li><strong>Responsive issues:</strong> Nút bị ẩn trên mobile</li>
+        </ol>
+        
+        <h3>🛠️ Cách khắc phục:</h3>
+        <ol>
+            <li><strong>Kiểm tra dữ liệu:</strong> Console.log totalPages, currentPage</li>
+            <li><strong>Cải thiện styling:</strong> Làm nút rõ ràng hơn với border</li>
+            <li><strong>Debug loading:</strong> Kiểm tra loading state</li>
+            <li><strong>Test responsive:</strong> Kiểm tra trên mobile</li>
+            <li><strong>Nhất quán styling:</strong> Dùng màu xanh như trang đơn hàng</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🚀 Đề Xuất Cải Tiến</h2>
+        
+        <h3>1. Cải thiện styling để rõ ràng hơn:</h3>
+        <div class="code-block">
+// Thay đổi hover color để nhất quán với trang đơn hàng
+className={`px-3 py-1 rounded-md ${
+  currentPage === page
+    ? 'bg-blue-600 text-white font-medium'
+    : loading
+    ? 'text-gray-400 cursor-not-allowed'
+    : 'text-blue-600 hover:bg-blue-50' // Thay đổi từ gray sang blue
+}`}
+        </div>
+        
+        <h3>2. Thêm border để nút rõ ràng hơn:</h3>
+        <div class="code-block">
+className={`px-3 py-1 rounded-md border ${
+  currentPage === page
+    ? 'bg-blue-600 text-white border-blue-600 font-medium'
+    : loading
+    ? 'text-gray-400 cursor-not-allowed border-gray-300'
+    : 'text-blue-600 hover:bg-blue-50 border-blue-300'
+}`}
+        </div>
+        
+        <h3>3. Debug để kiểm tra dữ liệu:</h3>
+        <div class="code-block">
+console.log('Pagination Debug:', {
+  currentPage,
+  totalPages,
+  visiblePages,
+  loading
+});
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">✅ Kết Luận</h2>
+        
+        <div class="status exists">
+            🎯 <strong>Các nút số trang ĐÃ CÓ trong component!</strong>
+        </div>
+        
+        <p>Component Pagination đã implement đầy đủ các nút số trang với:</p>
+        <ul>
+            <li>✅ Logic tính toán trang hiển thị thông minh</li>
+            <li>✅ Highlight trang hiện tại</li>
+            <li>✅ Click handlers để chuyển trang</li>
+            <li>✅ Ellipsis cho các trang xa</li>
+            <li>✅ Responsive design</li>
+        </ul>
+        
+        <p><strong>Nếu bạn không thấy các nút số trang, có thể do:</strong></p>
+        <ul>
+            <li>Dữ liệu pagination chưa đúng (totalPages ≤ 1)</li>
+            <li>Styling cần cải thiện để rõ ràng hơn</li>
+            <li>Loading state đang active</li>
+        </ul>
+        
+        <p><strong>Hãy cho tôi biết bạn muốn tôi cải thiện phần nào cụ thể!</strong></p>
+    </div>
+</body>
+</html>

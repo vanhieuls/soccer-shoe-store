@@ -6,6 +6,7 @@ import com.dailycodework.shopping_cart.Exception.AppException;
 import com.dailycodework.shopping_cart.Exception.ErrorCode;
 import com.dailycodework.shopping_cart.Service.ImpInterface.ImpCart;
 import com.dailycodework.shopping_cart.Service.Interface.ICart;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +22,9 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CartController {
     ICart cartService;
+    @Operation(
+            summary = "Lấy giỏ hàng theo id"
+    )
     @GetMapping("/get-cart/{id}")
     public ApiResponse<Cart> getCart(@PathVariable Long id) {
         return ApiResponse.<Cart>builder()
@@ -29,6 +33,9 @@ public class CartController {
                 .result(cartService.getCart(id))
                 .build();
     }
+    @Operation(
+            summary = "Xóa giỏ hàng theo id"
+    )
     @DeleteMapping("/delete-cart/{id}")
     public ApiResponse<Void> clearCart(@PathVariable Long id) {
         cartService.clearCart(id);
@@ -38,6 +45,9 @@ public class CartController {
                 .build();
 
     }
+    @Operation(
+            summary = "Lấy tổng tiền giỏ hàng theo id"
+    )
     @GetMapping("/get-price/{id}")
     public ApiResponse<BigDecimal> getPrice(@PathVariable Long id) {
         BigDecimal totalAmount= cartService.getTotalPrice(id);

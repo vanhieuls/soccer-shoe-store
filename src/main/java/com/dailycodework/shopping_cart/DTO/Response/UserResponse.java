@@ -3,8 +3,10 @@ package com.dailycodework.shopping_cart.DTO.Response;
 import com.dailycodework.shopping_cart.DTO.Dto.CartDto;
 import com.dailycodework.shopping_cart.DTO.Dto.OrderDto;
 import com.dailycodework.shopping_cart.DTO.Dto.ReviewDto;
+import com.dailycodework.shopping_cart.DTO.Dto.RoleDto;
 import com.dailycodework.shopping_cart.Entity.Cart;
 import com.dailycodework.shopping_cart.Entity.Order;
+import com.dailycodework.shopping_cart.Entity.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
@@ -14,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -32,9 +35,12 @@ public class UserResponse {
     String dateOfBirth;
     String email;
     String username;
+    boolean nonLocked;
 //    String password;
     boolean checked;
+    boolean active;
     int pointVoucher;
+    Set<Role> roles;
 //    CartDto cart;
 //    List<OrderDto> order;
 //    List<ReviewDto> review;

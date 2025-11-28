@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {})
 public interface RoleMapper {
-    @Mapping(target = "permissions", ignore = true)
+//    @Mapping(target = "permissions", ignore = true)
     Role toRole (RoleRequest roleRequest);
     RoleDto toRoleDto (Role role);
     List<RoleDto> toRolesDto (List<Role> roles);

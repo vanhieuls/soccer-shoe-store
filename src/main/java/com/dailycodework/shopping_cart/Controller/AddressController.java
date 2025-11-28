@@ -7,6 +7,8 @@ import com.dailycodework.shopping_cart.Entity.Address;
 import com.dailycodework.shopping_cart.Exception.AppException;
 import com.dailycodework.shopping_cart.Exception.ErrorCode;
 import com.dailycodework.shopping_cart.Service.ImpInterface.ImpAddress;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,9 +23,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Tag(name = "Address")
 public class AddressController {
     ImpAddress addressService;
     @GetMapping("/get-all")
+    @Operation(
+            summary = "Lấy toàn bộ địa chỉ"
+    )
     public ApiResponse<List<AddressDto>> getAllAddresses() {
         return ApiResponse.<List<AddressDto>>builder()
                 .code(200)
@@ -31,7 +37,9 @@ public class AddressController {
                 .result(addressService.getAllAddresses())
                 .build();
     }
-
+    @Operation(
+            summary = "Lấy địa chỉ theo userId"
+    )
     @GetMapping("/get-by-user/{userId}")
     public ApiResponse<List<AddressDto>> getAddressesByUserId(@PathVariable Long userId) {
         return ApiResponse.<List<AddressDto>>builder()
@@ -40,7 +48,9 @@ public class AddressController {
                 .result(addressService.getAddressesByUserId(userId))
                 .build();
     }
-
+    @Operation(
+            summary = "Lấy địa chỉ theo id"
+    )
     @GetMapping("/get-by-id/{id}")
     public ApiResponse<AddressDto> getAddressById(@PathVariable Long id) {
         return ApiResponse.<AddressDto>builder()
@@ -49,7 +59,9 @@ public class AddressController {
                 .result(addressService.getAddressById(id))
                 .build();
     }
-
+    @Operation(
+            summary = "Tạo địa chỉ"
+    )
     @PostMapping("/create")
     public ApiResponse<AddressDto> createAddress(@RequestBody AddressRequest request) {
         return ApiResponse.<AddressDto>builder()
@@ -58,6 +70,9 @@ public class AddressController {
                 .result(addressService.createAddress(request))
                 .build();
     }
+    @Operation(
+            summary = "Cập nhật địa chỉ"
+    )
     @PutMapping("/update/{id}")
     public ApiResponse<AddressDto> updateAddress(@PathVariable Long id,@RequestBody AddressRequest request) {
         return ApiResponse.<AddressDto>builder()
@@ -66,6 +81,9 @@ public class AddressController {
                 .result(addressService.updateAddress(id, request))
                 .build();
     }
+    @Operation(
+            summary = "Xoá địa chỉ"
+    )
     @DeleteMapping("/delete/{userId}/{id}")
     public ApiResponse<Void> deleteAddress(@PathVariable Long userId, @PathVariable Long id) {
         addressService.deleteAddress(userId,id);

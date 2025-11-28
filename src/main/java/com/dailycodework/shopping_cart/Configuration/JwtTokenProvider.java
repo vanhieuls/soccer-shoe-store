@@ -1,5 +1,10 @@
 package com.dailycodework.shopping_cart.Configuration;
 
+import com.dailycodework.shopping_cart.DTO.Response.JwtInfo;
+import com.dailycodework.shopping_cart.Enum.TypeToken;
+import com.dailycodework.shopping_cart.Exception.AppException;
+import com.dailycodework.shopping_cart.Exception.ErrorCode;
+import com.dailycodework.shopping_cart.Repository.RedisRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,12 +16,18 @@ import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.StringJoiner;
 import java.util.UUID;
+
+import static com.dailycodework.shopping_cart.Enum.TypeToken.ACCESS_TOKEN;
+import static com.dailycodework.shopping_cart.Enum.TypeToken.REFRESH_TOKEN;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -28,65 +39,109 @@ public class JwtTokenProvider {
     long expirationDate;
     @Value("${security.jwt.token.expiration_refresh}")
     long expirationRefreshDate;
-    public String generateToken(UserDetails userDetails){
-        return deloyGenerateToken(userDetails,expirationDate);
+    @Value("${security.jwt.token.refreshKey}")
+    String refreshKey;
+    final RedisRepository redisRepository;
+
+    public String generateToken(UserDetails userDetails) {
+        return deloyGenerateToken(userDetails, expirationDate, ACCESS_TOKEN);
     }
-    public String generateRefreshToken(UserDetails userDetails){
-        return deloyGenerateToken(userDetails,expirationRefreshDate);
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return deloyGenerateToken(userDetails, expirationRefreshDate, REFRESH_TOKEN);
     }
-    public String deloyGenerateToken(UserDetails userDetails, long expireTime){
+
+    public String deloyGenerateToken(UserDetails userDetails, long expireTime, TypeToken typeToken) {
         String username = userDetails.getUsername();
         Date currentDate = new Date();
-        Date expireDate = new Date(new Date().getTime()+expireTime);
+        Date expireDate = new Date(new Date().getTime() + expireTime);
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString()) //id token: Dùng để thu hồi khi cần
                 .setSubject(username)
                 .setIssuedAt(currentDate)
                 .setExpiration(expireDate)
-                .signWith(key())
+                .claim("Role", buildScope(userDetails)) //Vai trò của user
+                .signWith(key(typeToken))
                 .compact();
     }
-    private Key key(){
-        byte[] bytes = Decoders.BASE64URL.decode(secretKey);
-        return Keys.hmacShaKeyFor(bytes);
+    private String buildScope(UserDetails userDetails) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (!CollectionUtils.isEmpty(userDetails.getAuthorities())) {
+            userDetails.getAuthorities().forEach(s -> {
+                stringJoiner.add(s.getAuthority());
+            });
+        }
+        return stringJoiner.toString();
     }
-    public Date getExpiryTime(String token){
-        Claims claims= Jwts.parserBuilder()
-                .setSigningKey(key())
+
+    private Key key(TypeToken typeKey) {
+        if (ACCESS_TOKEN.equals(typeKey)) {
+            byte[] bytes = Decoders.BASE64URL.decode(secretKey);
+            return Keys.hmacShaKeyFor(bytes);
+        } else {
+            byte[] bytes = Decoders.BASE64URL.decode(refreshKey);
+            return Keys.hmacShaKeyFor(bytes);
+        }
+    }
+
+    public Date getExpiryTime(String token, TypeToken typeKey) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key(typeKey))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
         Date expiryTime = claims.getExpiration();
         return expiryTime;
     }
-    public boolean isTokenValid(String token){
-        Claims claims= Jwts.parserBuilder()
-                .setSigningKey(key())
+
+    public JwtInfo parseToken(String token, TypeToken typeKey) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key(typeKey))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return  claims.getExpiration().after(Date.from(Instant.now()));
+        return JwtInfo.builder()
+                .jwtId(claims.getId())
+                .issuedAt(claims.getIssuedAt())
+                .expiredTime(claims.getExpiration())
+                .build();
     }
-    public String extractUsername (String token){
+
+    public boolean isTokenValid(String token, TypeToken typeKey) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key())
+                .setSigningKey(key(typeKey))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getExpiration().after(Date.from(Instant.now()));
+    }
+
+    public String extractUsername(String token, TypeToken typeKey) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key(typeKey))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
     }
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key()) //// Lấy key từ phương thức key()
-                    .build()
-                    //Giải mã token và kiểm tra các thông tin như hết hạn (expiration), tính hợp lệ của cấu trúc.
-                    .parse(token);//🔹 Giải mã token. Có thể giải mã cả JWS (signed JWT) lẫn JWT không có chữ ký (unsigned JWT).
-            return true;
-        } catch (ExpiredJwtException | IllegalArgumentException | SignatureException | MalformedJwtException e) {
-            throw new RuntimeException(e); // 🔥 Token không hợp lệ
+
+    public boolean validateToken(String token, TypeToken typeKey) {
+        {
+            try {
+                if (redisRepository.existsById(parseToken(token, typeKey).getJwtId())) {
+                    return false;
+                } else {
+                    Jwts.parserBuilder()
+                            .setSigningKey(key(typeKey)) //// Lấy key từ phương thức key()
+                            .build()
+                            //Giải mã token và kiểm tra các thông tin như hết hạn (expiration), tính hợp lệ của cấu trúc.
+                            .parse(token);//🔹 Giải mã token. Có thể giải mã cả JWS (signed JWT) lẫn JWT không có chữ ký (unsigned JWT).
+                    return true;
+                }
+            } catch (ExpiredJwtException | IllegalArgumentException | SignatureException | MalformedJwtException e) {
+                throw new RuntimeException(e); // 🔥 Token không hợp lệ
+            }
         }
-    }
 // Tức là JJWT tự kiểm tra hết hạn và các lỗi bảo mật, bạn không cần kiểm tra thủ công nữa.
 //            //Nếu token:
 ////hết hạn → ném ExpiredJwtException
@@ -96,4 +151,5 @@ public class JwtTokenProvider {
 ////token lỗi định dạng → MalformedJwtException
 ////
 ////null hoặc không parse được → IllegalArgumentException
+    }
 }

@@ -27,6 +27,7 @@ public class OrderDto {
     OderStatus oderStatus;
     List<OrderItemDto> orderItems;
     BigDecimal discountApplied;
+    BigDecimal shippingFee;
     LocalDateTime createdAt;
     String orderCode;
     String shippingAddress;

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thành công</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 50px 40px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease 0.2s both;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        .success-icon svg {
+            width: 60px;
+            height: 60px;
+            stroke: white;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: drawCheck 0.5s ease 0.5s forwards;
+        }
+        @keyframes drawCheck {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        h1 {
+            color: #11998e;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .details-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .details-item:last-child {
+            border-bottom: none;
+        }
+        .details-label {
+            color: #888;
+            font-weight: 600;
+        }
+        .details-value {
+            color: #333;
+            font-weight: 600;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button, a {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        }
+        .btn-secondary {
+            background: white;
+            color: #11998e;
+            border: 2px solid #11998e;
+        }
+        .btn-secondary:hover {
+            background: #11998e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">
+            <svg fill="none" viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+
+        <h1>Thanh toán thành công! ✅</h1>
+        <p>Cảm ơn bạn đã thanh toán. Giao dịch của bạn đã được xử lý thành công.</p>
+
+        <div class="details">
+            <div class="details-item">
+                <span class="details-label">Mã giao dịch:</span>
+                <span class="details-value" id="paymentId">-</span>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Trạng thái:</span>
+                <span class="details-value" style="color: #11998e;">Đã thanh toán</span>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Thời gian:</span>
+                <span class="details-value" id="currentTime">-</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="/api" class="btn-primary">Về trang chủ</a>
+            <a href="/api/orders" class="btn-secondary">Xem đơn hàng</a>
+        </div>
+    </div>
+
+    <script>
+        // Get payment ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentId = urlParams.get('paymentId') || 'N/A';
+        document.getElementById('paymentId').textContent = paymentId;
+
+        // Display current time
+        const now = new Date();
+        document.getElementById('currentTime').textContent = now.toLocaleString('vi-VN');
+    </script>
+</body>
+</html>
+

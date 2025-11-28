@@ -29,7 +29,7 @@ public class ProductResponse {
     BigDecimal price;
     int inventory;
     String description;
-    Long collectionId;
+    String collectionId;
     Category category;
 
     List<ImageDto> images;

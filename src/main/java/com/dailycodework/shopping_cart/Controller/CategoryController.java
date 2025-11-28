@@ -20,7 +20,7 @@ import java.util.List;
 public class CategoryController {
     ICategory categoryService;
 
-    @GetMapping("/getcategory/{name}")
+    @GetMapping("/get-by-name/{name}")
     public ApiResponse<Category> getCategoryByName(@PathVariable String name){
         Category category = categoryService.getCategoryByName(name);
         return ApiResponse.<Category>builder()
@@ -29,7 +29,7 @@ public class CategoryController {
                 .result(category)
                 .build();
     }
-    @GetMapping("/getcategory/{id}")
+    @GetMapping("/get-by-id/{id}")
     public ApiResponse<Category> getCategoryById(@PathVariable Long id){
         Category category = categoryService.getCategoryById(id);
         return ApiResponse.<Category>builder()

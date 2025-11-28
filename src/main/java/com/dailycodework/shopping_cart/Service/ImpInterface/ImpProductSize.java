@@ -84,9 +84,9 @@ public class ImpProductSize implements IProductSize {
     public ProductsizeDto update(Long id, ProductSizeRequest ps) {
         ProductSize productSize = productSizeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_SIZE_NOT_EXIST));
-        if (productSizeRepository.existsBySizeIdAndProductId(ps.getSizeId(), ps.getProductId())) {
-            throw new AppException(ErrorCode.PRODUCT_SIZE_EXISTED);
-        }
+//        if (productSizeRepository.existsBySizeIdAndProductId(ps.getSizeId(), ps.getProductId())) {
+//            throw new AppException(ErrorCode.PRODUCT_SIZE_EXISTED);
+//        }
         productSizeMapper.updateProductSize(productSize, ps);
         return productSizeMapper.toProductSizeDto(productSizeRepository.save(productSize));
     }

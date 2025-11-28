@@ -8,6 +8,8 @@ import com.dailycodework.shopping_cart.Entity.Voucher;
 import com.dailycodework.shopping_cart.Exception.AppException;
 import com.dailycodework.shopping_cart.Exception.ErrorCode;
 import com.dailycodework.shopping_cart.Service.Interface.IVoucher;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,8 +25,10 @@ import java.util.List;
 @RequestMapping("/voucher")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Voucher")
 public class VoucherController {
     IVoucher voucherService;
+    @Operation(summary = "Tạo voucher mới")
     @PostMapping("/create")
     public ApiResponse<VoucherDto> createVoucher (@RequestBody VoucherRequest request){
         return ApiResponse.<VoucherDto>builder()
@@ -33,6 +37,7 @@ public class VoucherController {
                 .result(voucherService.createVoucher(request))
                 .build();
     }
+    @Operation(summary = "Lấy voucher theo id")
     @GetMapping("/getVoucher/{id}")
     public ApiResponse<VoucherDto> getVoucherById (@PathVariable Long id){
         return ApiResponse.<VoucherDto>builder()
@@ -41,6 +46,7 @@ public class VoucherController {
                 .result(voucherService.getVoucherById(id))
                 .build();
     }
+    @Operation(summary = "Xóa voucher theo id")
     @DeleteMapping("/delete/{id}")
     public ApiResponse<Void> deleteVoucher(@PathVariable Long id){
         voucherService.deleteVoucher(id);
@@ -49,6 +55,7 @@ public class VoucherController {
                 .message("delete success")
                 .build();
     }
+    @Operation(summary = "Lấy tất cả voucher với phân trang và sắp xếp")
     @GetMapping("/getAll")
     public ApiResponse<Page<VoucherDto>> getAllVoucher(@RequestParam(required = false, defaultValue = "0") Integer pageNumber,@RequestParam(required = false, defaultValue = "10") Integer pageSize
             ,@RequestParam(required = false, defaultValue = "asc") String sortDir) {
@@ -66,6 +73,7 @@ public class VoucherController {
                 .result(voucherDtoList)
                 .build();
     }
+    @Operation(summary = "Cập nhật voucher theo id")
     @PutMapping("/update/{id}")
     public ApiResponse<VoucherDto> updateVoucher(@PathVariable Long id,@RequestBody VoucherRequest request) {
         return ApiResponse.<VoucherDto>builder()
@@ -74,6 +82,7 @@ public class VoucherController {
                 .result(voucherService.updateVoucher(id,request))
                 .build();
     }
+    @Operation(summary = "Thêm voucher vào người dùng")
     @PostMapping("/addVoucher/{userId}/{voucherId}")
     public ApiResponse<Void> addVoucherToUser(@PathVariable Long userId, @PathVariable Long voucherId) {
         voucherService.addVoucherToUser(userId, voucherId);
@@ -82,6 +91,7 @@ public class VoucherController {
                 .message("add voucher success")
                 .build();
     }
+    @Operation(summary = "Lấy voucher theo userId")
     @GetMapping("/getVouchersByUserId/{userId}")
     public ApiResponse<List<VoucherDto>> getVouchersByUserId(@PathVariable Long userId) {
         return ApiResponse.<List<VoucherDto>>builder()
@@ -90,14 +100,16 @@ public class VoucherController {
                 .result(voucherService.getVouchersByUserId(userId))
                 .build();
     }
-    @DeleteMapping("/deleteVoucher/{voucherId}")
-    public ApiResponse<Void> deleteVoucherId(@PathVariable Long voucherId) {
-        voucherService.deleteVoucher(voucherId);
-        return ApiResponse.<Void>builder()
-                .code(200)
-                .message("delete voucher success")
-                .build();
-    }
+//    @Operation(summary = "Xóa voucher khỏi người dùng")
+//    @DeleteMapping("/deleteVoucher/{voucherId}")
+//    public ApiResponse<Void> deleteVoucherId(@PathVariable Long voucherId) {
+//        voucherService.deleteVoucher(voucherId);
+//        return ApiResponse.<Void>builder()
+//                .code(200)
+//                .message("delete voucher success")
+//                .build();
+//    }
+    @Operation(summary = "Tìm voucher theo mã code")
     @GetMapping("/findByCode/{code}")
     public ApiResponse<VoucherDto> findByCode(@RequestParam String code) {
         return ApiResponse.<VoucherDto>builder()

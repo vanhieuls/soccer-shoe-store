@@ -4,6 +4,7 @@ import com.dailycodework.shopping_cart.DTO.Dto.CollectionDto;
 import com.dailycodework.shopping_cart.DTO.Request.CollectionRequest;
 import com.dailycodework.shopping_cart.DTO.Response.ProductResponse;
 import com.dailycodework.shopping_cart.Entity.Collections;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
@@ -13,10 +14,11 @@ public interface ICollection {
     List<ProductResponse> getAllProductsInCollection(Long collectionId);
     void deleteCollection(Long collectionId);
     CollectionDto createCollection(String name, String description, MultipartFile imageFile);
-    List<CollectionDto> getAllCollections();
+    Page<CollectionDto> getAllCollections(Integer page, Integer size);
     CollectionDto getCollectionById(Long collectionId);
 //    Collections getCollectionById(Long collectionId);
 //    List<Collections> getAllCollection();
     CollectionDto updateCollection(String name, String description, MultipartFile imageFile, Long collectionId);
     List<CollectionDto> getCollectionByName(String name);
+    void deleteProductFromCollection(Long collectionId, Long productId);
 }

@@ -138,9 +138,9 @@ public class ProductController {
     }
 
     @PutMapping("/update/{id}")
-    public ApiResponse<Product> updateProductExisted(@RequestBody ProductUpdateRequest request,@PathVariable Long id){
-        Product product = productService.updateProductExisted(request,id);
-        return ApiResponse.<Product>builder()
+    public ApiResponse<ProductResponse> updateProductExisted(@RequestBody ProductUpdateRequest request,@PathVariable Long id){
+        ProductResponse product = productService.updateProductExisted(request,id);
+        return ApiResponse.<ProductResponse>builder()
                 .code(200)
                 .message("update product success")
                 .result(product)
@@ -163,6 +163,23 @@ public class ProductController {
                 .code(200)
                 .message("get product success")
                 .result(products)
+                .build();
+    }
+    @GetMapping("/count-discount")
+    public ApiResponse<Long> countByDiscount() {
+        return ApiResponse.<Long>builder()
+                .result(productService.countByDiscount())
+                .message("get quantity discount success")
+                .code(200)
+                .build();
+    }
+
+    @GetMapping("/get-top-10-new-in")
+    public ApiResponse<List<ProductResponse>> findTop10ByCreatedDesc() {
+        return ApiResponse.<List<ProductResponse>>builder()
+                .code(200)
+                .message("get top 10 product success")
+                .result(productService.findTop10ByCreatedDesc())
                 .build();
     }
 

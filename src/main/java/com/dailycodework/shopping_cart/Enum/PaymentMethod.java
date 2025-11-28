@@ -6,5 +6,6 @@ import lombok.Getter;
 
 public enum PaymentMethod {
     PAYOS,
-    COD
+    COD,
+    PAYPAL
 }

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Pagination Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-title {
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .status.working { background-color: #dcfce7; color: #166534; }
+        .status.missing { background-color: #fef2f2; color: #dc2626; }
+        .status.needs-improvement { background-color: #fef3c7; color: #d97706; }
+        .code-block {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f9fafb;
+            font-weight: bold;
+        }
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .feature-list li:before {
+            content: "•";
+            color: #6b7280;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Products Pagination Analysis & Test Results</h1>
+    
+    <div class="test-section">
+        <h2 class="test-title">📊 Current Implementation Status</h2>
+        
+        <h3>✅ Working Features:</h3>
+        <div class="status working">✓ Basic pagination structure in ProductStore</div>
+        <div class="status working">✓ Custom Pagination component with proper UI</div>
+        <div class="status working">✓ Page navigation with changePage method</div>
+        <div class="status working">✓ Smooth scrolling on page change</div>
+        <div class="status working">✓ API integration with /products/get-products</div>
+        <div class="status working">✓ Proper pagination metadata handling</div>
+        
+        <h3>❌ Missing Features:</h3>
+        <div class="status missing">✗ Page size selector dropdown</div>
+        <div class="status missing">✗ changePageSize method not imported</div>
+        <div class="status missing">✗ Loading states during pagination transitions</div>
+        <div class="status missing">✗ Consistent styling with Order pages</div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🔄 Pagination Comparison: Orders vs Products</h2>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Order Pages</th>
+                    <th>Products Page</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Basic Pagination</td>
+                    <td>✅ Custom inline component</td>
+                    <td>✅ Separate Pagination component</td>
+                    <td><span class="status working">Working</span></td>
+                </tr>
+                <tr>
+                    <td>Page Size Selector</td>
+                    <td>✅ Dropdown with [5,10,20,50]</td>
+                    <td>❌ Not implemented</td>
+                    <td><span class="status missing">Missing</span></td>
+                </tr>
+                <tr>
+                    <td>Loading States</td>
+                    <td>✅ Shows loading during transitions</td>
+                    <td>❌ No loading feedback</td>
+                    <td><span class="status missing">Missing</span></td>
+                </tr>
+                <tr>
+                    <td>Pagination Info</td>
+                    <td>✅ "Hiển thị X-Y trong tổng số Z"</td>
+                    <td>✅ "Hiển thị X-Y trên Z sản phẩm"</td>
+                    <td><span class="status working">Working</span></td>
+                </tr>
+                <tr>
+                    <td>Smooth Scrolling</td>
+                    <td>❌ Not implemented</td>
+                    <td>✅ Scrolls to top on page change</td>
+                    <td><span class="status working">Better</span></td>
+                </tr>
+                <tr>
+                    <td>API Integration</td>
+                    <td>✅ Multiple endpoints</td>
+                    <td>✅ /products/get-products</td>
+                    <td><span class="status working">Working</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🛠️ Implementation Plan</h2>
+        
+        <h3>1. Add Page Size Selector</h3>
+        <div class="code-block">
+// Add to Products.jsx imports
+const { changePageSize } = useProductStore()
+
+// Add page size selector UI
+&lt;div className='mt-2 flex items-center'&gt;
+  &lt;span className='mr-2 text-sm text-gray-700'&gt;Hiển thị:&lt;/span&gt;
+  &lt;select
+    value={pagination.pageSize}
+    onChange={e =&gt; changePageSize(Number(e.target.value))}
+    className='rounded-md border border-gray-300 px-2 py-1 text-sm'
+  &gt;
+    {[12, 24, 36, 48].map(size =&gt; (
+      &lt;option key={size} value={size}&gt;{size}&lt;/option&gt;
+    ))}
+  &lt;/select&gt;
+&lt;/div&gt;
+        </div>
+        
+        <h3>2. Add Loading States</h3>
+        <div class="code-block">
+// Show loading overlay during pagination
+{loading && (
+  &lt;div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center"&gt;
+    &lt;Loader2 className="h-8 w-8 animate-spin text-blue-600" /&gt;
+  &lt;/div&gt;
+)}
+        </div>
+        
+        <h3>3. Enhance Pagination Component</h3>
+        <div class="code-block">
+// Disable pagination controls during loading
+&lt;button
+  disabled={loading}
+  className={`${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+&gt;
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">🎯 Expected Results After Implementation</h2>
+        
+        <ul class="feature-list">
+            <li><strong>Page Size Control:</strong> Users can change items per page (12, 24, 36, 48)</li>
+            <li><strong>Loading Feedback:</strong> Visual loading states during pagination transitions</li>
+            <li><strong>Consistent UI:</strong> Matches Order pages styling and behavior</li>
+            <li><strong>Better UX:</strong> Disabled controls during loading prevent multiple requests</li>
+            <li><strong>Performance:</strong> Proper loading states prevent user confusion</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2 class="test-title">📋 Test Checklist</h2>
+        
+        <h3>Before Implementation:</h3>
+        <ul class="feature-list">
+            <li>✅ Basic pagination works (page navigation)</li>
+            <li>✅ API calls return correct data</li>
+            <li>✅ Pagination metadata is accurate</li>
+            <li>❌ No page size selector</li>
+            <li>❌ No loading states</li>
+        </ul>
+        
+        <h3>After Implementation (To Test):</h3>
+        <ul class="feature-list">
+            <li>□ Page size selector changes items per page</li>
+            <li>□ Loading states show during transitions</li>
+            <li>□ Pagination controls disabled during loading</li>
+            <li>□ Consistent styling with Order pages</li>
+            <li>□ Smooth scrolling still works</li>
+            <li>□ API integration remains stable</li>
+        </ul>
+    </div>
+</body>
+</html>

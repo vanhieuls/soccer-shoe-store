@@ -3,6 +3,8 @@ package com.dailycodework.shopping_cart.DTO.Dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @Builder
@@ -14,5 +16,7 @@ public class CollectionDto {
     String name;
     String description;
     String imageUrl;
+    LocalDateTime createdAt;
+    LocalDateTime updatedAt;
     // Additional fields can be added as needed
 }

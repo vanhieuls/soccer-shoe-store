@@ -16,6 +16,7 @@ public interface ProductSizeMapper {
     ProductSize toProductSize(ProductSizeRequest request);
     @Mapping(source = "product.id", target = "productId")
     @Mapping(source = "size.size", target = "sizeName")
+    @Mapping(source = "size.id", target = "sizeId")
     ProductsizeDto toProductSizeDto(ProductSize productSize);
     List<ProductsizeDto> toListProductSizeDto(List<ProductSize> productSizes);
     @Mapping(target = "product.id", source = "productId")

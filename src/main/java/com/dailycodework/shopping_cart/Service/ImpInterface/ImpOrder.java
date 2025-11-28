@@ -3,17 +3,13 @@ package com.dailycodework.shopping_cart.Service.ImpInterface;
 import com.dailycodework.shopping_cart.DTO.Dto.OrderDto;
 import com.dailycodework.shopping_cart.Entity.*;
 import com.dailycodework.shopping_cart.Enum.OderStatus;
-import com.dailycodework.shopping_cart.Enum.PaymentMethod;
-import com.dailycodework.shopping_cart.Enum.PaymentStatus;
 import com.dailycodework.shopping_cart.Exception.AppException;
 import com.dailycodework.shopping_cart.Exception.ErrorCode;
 import com.dailycodework.shopping_cart.Helper.OrderSpecification.OrderSpecification;
-import com.dailycodework.shopping_cart.Helper.ProductSpecification.ProductSpecification;
 import com.dailycodework.shopping_cart.Mapper.OrderMapper;
 import com.dailycodework.shopping_cart.Repository.*;
 import com.dailycodework.shopping_cart.Service.Interface.ICart;
 import com.dailycodework.shopping_cart.Service.Interface.IOrder;
-import com.dailycodework.shopping_cart.Service.Interface.IPayment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,10 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -34,14 +30,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.dailycodework.shopping_cart.Enum.OderStatus.CONFIRMED;
 import static com.dailycodework.shopping_cart.Enum.OderStatus.PENDING;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class ImpOrder implements IOrder {
-//    PaymentRepository paymentRepository;
-//    IPayment PaymentService;
     OrderRepository orderRepository;
     ProductRepository productRepository;
     CartRepository cartRepository;
@@ -125,7 +120,6 @@ public class ImpOrder implements IOrder {
         cartRepository.save(cart);
         return orderMapper.toOrderDto(saveOder);
     }
-
     private Set<OrderItem> mapCartItemsToOrderItems(Set<CartItem> cartItems, Order order) {
         return cartItems.stream()
                 .map(cartItem ->{
@@ -192,11 +186,6 @@ public class ImpOrder implements IOrder {
     @Override
     public OrderDto getOrder(Long orderId) {
         return orderMapper.toOrderDto(orderRepository.findById(orderId).orElseThrow(()->new AppException(ErrorCode.ORDER_NOT_FOUND)));
-    }
-
-    @Override
-    public Page<OrderDto> getOrdersByUserId(Integer pageNumber, Integer pageSize, Long userId) {
-        return null;
     }
 
     @Override
@@ -293,32 +282,27 @@ public class ImpOrder implements IOrder {
         userRepository.save(user);
         return orderMapper.toOrderDto(orderRepository.save(order));
     }
-
     @Override
     public OrderDto testApplyVoucher(Long orderId, Long voucherId) {
-        return null;
+        Order order = orderRepository.findById(orderId).orElseThrow(()->new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Voucher voucher = voucherRepository.findById(voucherId).orElseThrow(()->new AppException(ErrorCode.VOUCHER_NOT_EXIST));
+        if(!voucher.isActive()||voucher.getUsageLimit()<=voucher.getUsedCount()||voucher.getStartDate().isAfter(LocalDateTime.now())||voucher.getEndDate().isBefore(LocalDateTime.now())){
+            throw new AppException(ErrorCode.VOUCHER_INVALID);
+        }
+        if (voucher.getMinOrderAmount() !=null && order.getTotalAmount().compareTo(voucher.getMinOrderAmount())<0) {
+            throw new RuntimeException("Order amount too low for this voucher");
+        }
+        BigDecimal discount = voucher.isPercentTage()?order.getTotalAmount().multiply(voucher.getDiscountAmount()).divide(BigDecimal.valueOf(100)): voucher.getDiscountAmount();
+        if(voucher.getMaxDiscountAmount()==null){
+            discount = discount.min(order.getTotalAmount());
+        }
+        else discount = discount.min(voucher.getMaxDiscountAmount());
+        // Gán voucher vào order
+//        order.setVoucher(voucher);
+        order.setDiscountApplied(discount);
+        order.setTotalAmount(order.getTotalAmount().subtract(discount));
+        return orderMapper.toOrderDto(order);
     }
-//    @Override
-//    public OrderDto testApplyVoucher(Long orderId, Long voucherId) {
-//        Order order = orderRepository.findById(orderId).orElseThrow(()->new AppException(ErrorCode.ORDER_NOT_FOUND));
-//        Voucher voucher = voucherRepository.findById(voucherId).orElseThrow(()->new AppException(ErrorCode.VOUCHER_NOT_EXIST));
-//        if(!voucher.isActive()||voucher.getUsageLimit()<=voucher.getUsedCount()||voucher.getStartDate().isAfter(LocalDateTime.now())||voucher.getEndDate().isBefore(LocalDateTime.now())){
-//            throw new AppException(ErrorCode.VOUCHER_INVALID);
-//        }
-//        if (voucher.getMinOrderAmount() !=null && order.getTotalAmount().compareTo(voucher.getMinOrderAmount())<0) {
-//            throw new RuntimeException("Order amount too low for this voucher");
-//        }
-//        BigDecimal discount = voucher.isPercentTage()?order.getTotalAmount().multiply(voucher.getDiscountAmount()).divide(BigDecimal.valueOf(100)): voucher.getDiscountAmount();
-//        if(voucher.getMaxDiscountAmount()==null){
-//            discount = discount.min(order.getTotalAmount());
-//        }
-//        else discount = discount.min(voucher.getMaxDiscountAmount());
-//        // Gán voucher vào order
-////        order.setVoucher(voucher);
-//        order.setDiscountApplied(discount);
-//        order.setTotalAmount(order.getTotalAmount().subtract(discount));
-//        return orderMapper.toOrderDto(order);
-//    }
 
     @Override
     public OrderDto updateOrderStatus(Long orderId, OderStatus status) {
@@ -329,19 +313,16 @@ public class ImpOrder implements IOrder {
         if((order.getOderStatus() == OderStatus.SHIPPING || order.getOderStatus() == OderStatus.DELIVERED)&& status == OderStatus.CANCELLED) {
             throw new AppException(ErrorCode.CAN_NOT_CANCELLED_AFTER_SHIPPED);
         }
-        // Nếu hủy đơn hàng thì hoàn lại số lượng sản phẩm
-        if(status == OderStatus.CANCELLED) {
-            for (OrderItem orderItem : order.getOrderItems()) {
-                ProductSize productSize = orderItem.getProductSize();
-                if (productSize == null) {
-                    throw new AppException(ErrorCode.PRODUCT_SIZE_NOT_FOUND);
-                }
-                productSize.setQuantity(productSize.getQuantity() + orderItem.getQuantity());
-                productSizeRepository.save(productSize);
-                Product product = orderItem.getProduct();
-                product.setInventory(product.getInventory() + orderItem.getQuantity());
-                productRepository.save(product);
+        for (OrderItem orderItem : order.getOrderItems()) {
+            ProductSize productSize = orderItem.getProductSize();
+            if (productSize == null) {
+                throw new AppException(ErrorCode.PRODUCT_SIZE_NOT_FOUND);
             }
+            productSize.setQuantity(productSize.getQuantity() + orderItem.getQuantity());
+            productSizeRepository.save(productSize);
+            Product product = orderItem.getProduct();
+            product.setInventory(product.getInventory() + orderItem.getQuantity());
+            productRepository.save(product);
         }
         order.setOderStatus(status);
         order.setUpdatedAt(LocalDateTime.now());
@@ -371,7 +352,7 @@ public class ImpOrder implements IOrder {
     }
 
     @Override
-    public Page<OrderDto> findOrderByNameAndDate(Integer pageNumber, Integer pageSize, String name, String startDay, String endDay) {
+    public Page<OrderDto> findOrderByNameAndDate(Integer pageNumber, Integer pageSize, OderStatus orderStatus, String name, String startDay, String endDay, Long userId) {
         LocalDateTime start = null;
         LocalDateTime end = null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -382,8 +363,8 @@ public class ImpOrder implements IOrder {
             end = LocalDateTime.parse(endDay + " 23:59:59", formatter);
         }
         Specification<Order> specification = Specification.where(null);
-        specification = specification.and(OrderSpecification.OrderSpecification(name, start, end));
-
+        specification = specification.and(OrderSpecification.OrderSpecification(userId, name, start, end));
+        specification = specification.and(OrderSpecification.hasStatus(orderStatus));
         Pageable pageable = null;
         if (pageNumber == null || pageNumber < 0) pageNumber = 0;
         if (pageSize == null || pageSize <= 0) pageSize = 10;
@@ -411,47 +392,25 @@ public class ImpOrder implements IOrder {
     }
 
     @Override
-    public void requestCancelOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-        if (order.getOderStatus() == OderStatus.PENDING) {
-            order.setOderStatus(OderStatus.CANCELLED);
-            order.setUpdatedAt(LocalDateTime.now());
-            // Hoàn lại số lượng sản phẩm
-            for (OrderItem orderItem : order.getOrderItems()) {
-                ProductSize productSize = orderItem.getProductSize();
-                if (productSize == null) {
-                    throw new AppException(ErrorCode.PRODUCT_SIZE_NOT_FOUND);
-                }
-                productSize.setQuantity(productSize.getQuantity() + orderItem.getQuantity());
-                productSizeRepository.save(productSize);
-                Product product = orderItem.getProduct();
-                product.setInventory(product.getInventory() + orderItem.getQuantity());
-                productRepository.save(product);
-            }
-            orderRepository.save(order);
-            return;
-        }
+    public OrderDto requestCancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(()->new AppException(ErrorCode.ORDER_NOT_FOUND));
         if (order.getOderStatus() == OderStatus.CANCELLED) {
             throw new AppException(ErrorCode.ORDER_CANCELLED);
         }
-        if((order.getOderStatus() == OderStatus.SHIPPING || order.getOderStatus() == OderStatus.DELIVERED)) {
+        else if(order.getOderStatus() == OderStatus.SHIPPING || order.getOderStatus() == OderStatus.DELIVERED) {
             throw new AppException(ErrorCode.CAN_NOT_CANCELLED_AFTER_SHIPPED);
         }
         order.setOderStatus(OderStatus.CANCEL_REQUESTED);
         order.setUpdatedAt(LocalDateTime.now());
-        orderRepository.save(order);
+        return orderMapper.toOrderDto(orderRepository.save(order));
     }
 
     @Override
-    public void ApproveCancelOrder(Long orderId) {
-        //nếu mún thêm từ chối yêu càua hủy đơn hàng thì nên , boolean isApproved để true thì cho hủy và ngược lại
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    public OrderDto confirmCancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(()->new AppException(ErrorCode.ORDER_NOT_FOUND));
         if (order.getOderStatus() != OderStatus.CANCEL_REQUESTED) {
             throw new AppException(ErrorCode.ORDER_NOT_IN_CANCEL_REQUESTED_STATUS);
         }
-        // Hoàn lại số lượng sản phẩm
         for (OrderItem orderItem : order.getOrderItems()) {
             ProductSize productSize = orderItem.getProductSize();
             if (productSize == null) {
@@ -465,154 +424,74 @@ public class ImpOrder implements IOrder {
         }
         order.setOderStatus(OderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());
-        orderRepository.save(order);
+        return orderMapper.toOrderDto(orderRepository.save(order));
     }
 
     @Override
-    @Transactional
-    public OrderDto placeOrderWithOptionalVoucher(Long userId, Long userAddressId, Long voucherId) {
-        // 1. Lấy địa chỉ người dùng
-        Address userAddress = addressRepository.findById(userAddressId)
-                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
-        String address = userAddress.getAddressLine() + ", "
-                + userAddress.getWardCommune() + ", "
-                + userAddress.getState() + ", "
-                + userAddress.getCountry();
+    public BigDecimal getTotalRevenue(LocalDate startDate,LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime endExclusive = endDate.plusDays(1).atStartOfDay(); // < end+1d (tránh lệch 23:59:59)
+        return orderRepository.getTotalRevenue(OderStatus.DELIVERED, start, endExclusive);
+    }
 
-        // 2. Lấy giỏ hàng user
-        Cart cart = cartService.getCartByUserId(userId);
-        if(cart.getCartItems().stream().noneMatch(CartItem::isSelected)) {
-            throw new AppException(ErrorCode.DO_NOT_HAVE_SELECTED_CART_ITEM_TO_CREATE_ORDER);
+    @Override
+    public Long countOrdersByStatus(OderStatus status) {
+        if(status == null) {
+            throw new RuntimeException("Status must not be null");
         }
-//        if(cart.getCartItems().isEmpty()) {
-//            throw new AppException(ErrorCode.DO_NOT_HAVE_CART_ITEM_TO_CREATE_ORDER);
-//        }
-        Set<CartItem> selectedItems = new HashSet<>(
-                cart.getCartItems().stream().filter(CartItem::isSelected).toList()
+        if(status != OderStatus.PENDING && status != CONFIRMED && status != OderStatus.SHIPPING &&
+                status != OderStatus.DELIVERED && status != OderStatus.CANCEL_REQUESTED && status != OderStatus.CANCELLED){
+            throw new RuntimeException("Invalid status value");
+        }
+        return orderRepository.countByOderStatus(status);
+    }
+
+    @Override
+    public void processPendingOrders() {
+        System.out.println("Processing Orders");
+        List<Order> pendingOrders = orderRepository.findByOderStatus(PENDING);
+        pendingOrders.forEach(
+                order->{
+                    order.setOderStatus(CONFIRMED);
+                    System.out.println("Order ID " + order.getId() + " status updated to CONFIRMED");
+                    orderRepository.save(order);
+                }
         );
 
-        // 3. Tạo Order
-        Order order = Order.builder()
-                .oderStatus(PENDING)
-                .user(cart.getUser())
-                .shippingAddress(address)
-                .build();
-
-        // 4. Map cartItems -> orderItems
-        Set<OrderItem> orderItemSet = mapCartItemsToOrderItems(selectedItems, order);
-        order.setOrderItems(orderItemSet);
-
-        // 5. Tính tổng tiền trước discount
-        BigDecimal itemsTotal = calculateTotalAmount(orderItemSet);
-        BigDecimal shippingFee = BigDecimal.valueOf(20000);
-        BigDecimal totalBeforeDiscount = itemsTotal.add(shippingFee);
-
-        order.setShippingFee(shippingFee);
-        order.setTotalAmount(totalBeforeDiscount);
-
-        // 6. Nếu có voucherId thì kiểm tra và áp dụng
-        if (voucherId != null) {
-            Voucher voucher = voucherRepository.findById(voucherId)
-                    .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_EXIST));
-
-            User user = order.getUser();
-
-            // Validate voucher
-            if (!voucher.getUsers().contains(user)) {
-                throw new AppException(ErrorCode.VOUCHER_NOT_OWNED);
-            }
-            if (!voucher.isActive()) {
-                throw new AppException(ErrorCode.VOUCHER_NOT_ACTIVE);
-            }
-            if (voucher.getUsageLimit() <= voucher.getUsedCount()) {
-                throw new AppException(ErrorCode.VOUCHER_USAGE_LIMIT_EXCEEDED);
-            }
-            if (voucher.getStartDate().isAfter(LocalDateTime.now())
-                    || voucher.getEndDate().isBefore(LocalDateTime.now())) {
-                throw new AppException(ErrorCode.EXPIRED_VOUCHER);
-            }
-            if (voucher.getMinOrderAmount() != null
-                    && totalBeforeDiscount.compareTo(voucher.getMinOrderAmount()) < 0) {
-                throw new AppException(ErrorCode.ORDER_AMOUNT_TOO_LOW);
-            }
-
-            // Tính discount
-            BigDecimal discount = voucher.isPercentTage()
-                    ? totalBeforeDiscount.multiply(voucher.getDiscountAmount())
-                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP)
-                    : voucher.getDiscountAmount();
-
-            if (voucher.getMaxDiscountAmount() != null) {
-                discount = discount.min(voucher.getMaxDiscountAmount());
-            } else {
-                discount = discount.min(totalBeforeDiscount);
-            }
-
-            // Áp dụng discount
-            order.setDiscountApplied(discount);
-            order.setTotalAmount(totalBeforeDiscount.subtract(discount));
-
-            // Cập nhật voucher
-            voucher.setUsedCount(voucher.getUsedCount() + 1);
-            voucher.getUsers().remove(user); // remove voucher khỏi user đã dùng
-            voucherRepository.save(voucher);
-
-            // Cập nhật điểm voucher user
-            user.setPointVoucher(user.getPointVoucher() - voucher.getPointRequired());
-            userRepository.save(user);
-        }
-
-        // 7. Clear cart đã chọn
-        cartService.clearSelectedItems(cart.getId());
-        BigDecimal remainingAmount = cart.getCartItems().stream()
-                .filter(item -> !item.isSelected())
-                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        cart.setTotalAmount(remainingAmount);
-        cartRepository.save(cart);
-
-        // 8. Cộng điểm voucher cho user vì đã đặt hàng
-        User user = cart.getUser();
-        user.setPointVoucher(user.getPointVoucher() + 1);
-        userRepository.save(user);
-
-//        // 9. Tạo Payment cho order
-//        Payment payment = Payment.builder()
-//                .order(order)
-//                .amount(order.getTotalAmount())
-//                .amountPaid(BigDecimal.ZERO)
-//                .amountRemaining(order.getTotalAmount())
-//                .method(PaymentMethod.COD)
-//                .status(PaymentStatus.UNPAID)
-//                .build();
-//        order.setPayment(payment); // set 2 chiều
-
-        // 10. Save order cuối cùng
-        Order savedOrder = orderRepository.save(order);
-
-        return orderMapper.toOrderDto(savedOrder);
+        System.out.println("Processed pending orders: " + pendingOrders.size());
     }
-//    private Order createOrUpdatePaymentForOrder(Order order, String method) {
-//
-//        if(method == "COD") {
-//
-//            Payment payment = Payment.builder()
-//                    .order(order)
-//                    .amount(order.getTotalAmount())
-//                    .amountPaid(BigDecimal.ZERO)
-//                    .amountRemaining(order.getTotalAmount())
-//                    .method(PaymentMethod.valueOf(method))  // set theo tham số
-//                    .status(PaymentStatus.UNPAID)
-//                    .build();
-//            order.setPayment(payment);
-//            paymentRepository.save(payment);
-//            return orderRepository.save(order);
-//        }
-//        else{
-//
-//            return orderRepository.save(order);
-//        }
-//
-//    }
+    @Override
+    public Page<OrderDto> getAllOrder(Integer pageNumber, Integer pageSize, String sortBy, String sortDir) {
+        Pageable pageable = null;
+        if(pageNumber == null || pageNumber < 0){
+            pageNumber = 0;
+        }
+        if(pageSize == null || pageSize <=0){
+            pageSize = 10;
+        }
+        String sortField = (sortBy != null) ? sortBy : "id";
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortField));
+//        Page<Order> orders = orderRepository.findAll(pageable);
+        Page<Order> orders = orderRepository.pageOrders(pageable);
+        if(orders.isEmpty()){
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+        return orders.map(orderMapper::toOrderDto);
+    }
+
+    @Override
+    public Page<OrderDto> filterOders(Integer pageNumber, Integer pageSize, String sortDir, String sortBy, Long id, Long orderCode, OderStatus status, LocalDate startDay, LocalDate endDay) {
+        Specification<Order> specification = Specification.where(null);
+        specification = specification.and(OrderSpecification.filerOrders(id, orderCode, status,  startDay, endDay));
+        Pageable pageable = null;
+        if (pageNumber == null || pageNumber < 0) pageNumber = 0;
+        if (pageSize == null || pageSize <= 0) pageSize = 10;
+        String sortField = (sortBy != null) ? sortBy : "id";
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        pageable = PageRequest.of(pageNumber, pageSize, Sort.by(direction, sortField));
+        Page<Order> orderPage = orderRepository.findAll(specification, pageable);
+        return orderPage.map(orderMapper::toOrderDto);
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.dailycodework.shopping_cart.Configuration;
 
+import com.dailycodework.shopping_cart.Entity.Role;
 import com.dailycodework.shopping_cart.Entity.User;
+import com.dailycodework.shopping_cart.Enum.Roles;
 import com.dailycodework.shopping_cart.Repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,13 +13,18 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
 //Nếu sử dụng passwordencoder thì sẽ tạo ra sự phụ thuộc
 //SecurityConfig --> CustomOAuth2SuccessHandler --> PasswordEncoder --> SecurityConfig
 //Cách tốt nhất là tách thằng passwordencoder ra làm class riêng rồi gọi mà lười quá nên note vậy thui nhé
@@ -28,29 +35,41 @@ import java.util.Optional;
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
     JwtTokenProvider jwtTokenProvider;
     UserRepository userRepository;
-//    PasswordEncoder passwordEncoder;
-    UserDetailsService userDetailsService;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email"); // hoặc "sub" hay "name"
-
+        System.out.println("Principal class: " + authentication.getPrincipal().getClass());
         // In log để xem Google trả về gì
         System.out.println("OAuth2 attributes: " + oAuth2User.getAttributes());
-
+        String givenName = oAuth2User.getAttribute("given_name");
+        String familyName = oAuth2User.getAttribute("family_name");
+        String picture = oAuth2User.getAttribute("picture");
         // Tìm user trong DB theo email (hoặc tạo mới nếu chưa có)
         Optional<User> userOpt = userRepository.findByEmail(email);
         User user;
         if (userOpt.isEmpty()) {
             user = new User();
+            user.setPhone("0000000000");
             user.setEmail(email);
-            user.setUsername(oAuth2User.getAttribute("given_name")); // hoặc dùng oAuth2User.getAttribute("name")
+            user.setFirstName(givenName);
+            user.setLastName(familyName);
+            user.setAvatar(picture);
+            user.setUsername(givenName != null ? givenName : email.split("@")[0]); // hoặc dùng oAuth2User.getAttribute("name")
             user.setChecked(true);
 //            user.setUsername(email.split("@")[0]); // hoặc dùng oAuth2User.getAttribute("name")
-            user.setPassword("123456"); // có thể để rỗng nếu dùng login Google
-//            user.setRole(Role.USER); // hoặc ROLE_GOOGLE
+            user.setChecked(true);
+            user.setNonLocked(true);
+            user.setActive(true);
+            // Gán role (hiện tại đang là ROLE_ADMIN)
+            Set<Role> roleSet = new HashSet<>();
+            Role entity = Role.builder()
+                    .name(Roles.valueOf(Roles.ROLE_USER.name()))
+                    .build();
+            roleSet.add(entity);
+            user.setRoles(roleSet);
             userRepository.save(user);
         } else {
             user = userOpt.get();
@@ -60,10 +79,12 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         UserDetails userDetails = user;
 
         String token = jwtTokenProvider.generateToken(userDetails);
+        String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
         System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
-        response.setContentType("application/json");
-        response.getWriter().write("{\"token\": \"" + token + "\"}");
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(
+                "{ \"access_token\": \"" + token + "\", " +
+                        "\"refresh_token\": \"" + refreshToken + "\" }"
+        );
     }
-
-
 }

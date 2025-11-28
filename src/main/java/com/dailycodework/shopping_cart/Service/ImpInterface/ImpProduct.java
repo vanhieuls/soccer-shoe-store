@@ -111,10 +111,10 @@ public class ImpProduct implements IProduct {
     }
 
     @Override
-    public Product updateProductExisted(ProductUpdateRequest request, Long id) {
+    public ProductResponse updateProductExisted(ProductUpdateRequest request, Long id) {
         Product product = productRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         productMapper.updateProduct(product,request);
-        return productRepository.save(product);
+        return productMapper.toProductResponse(productRepository.save(product));
     }
 
 
@@ -130,6 +130,18 @@ public class ImpProduct implements IProduct {
                 , Sort.by(direction, filter.getPropertySort() != null && !filter.getPropertySort().isEmpty() ? filter.getPropertySort() : "name"));
         Page<Product> productPage = productRepository.findAll(specification, pageable);
         return productPage.map(productMapper::toProductResponse);
+    }
+
+    @Override
+    public Long countByDiscount() {
+        return productRepository.countByDiscountGreaterThan(BigDecimal.ZERO);
+    }
+
+    @Override
+    public List<ProductResponse> findTop10ByCreatedDesc() {
+        PageRequest pageRequest = PageRequest.of(0,10);
+        return productRepository.findTop10ByOrderByCreatedAtDesc(pageRequest).stream().map(productMapper::toProductResponse).toList();
+
     }
 
     @Override

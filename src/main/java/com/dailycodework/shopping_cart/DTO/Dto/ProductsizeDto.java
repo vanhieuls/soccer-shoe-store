@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 public class ProductsizeDto {
     Long id;
     Long productId;
+    Long sizeId;
     Long sizeName;
     int quantity;
 }

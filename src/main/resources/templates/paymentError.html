@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lỗi thanh toán</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 50px 40px;
+            text-align: center;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .error-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease 0.2s both;
+            position: relative;
+        }
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        .error-icon::before {
+            content: '!';
+            font-size: 60px;
+            font-weight: bold;
+            color: white;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+        h1 {
+            color: #ee5a6f;
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .error-details {
+            background: #ffebee;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #ee5a6f;
+        }
+        .error-details p {
+            margin: 0;
+            text-align: left;
+            color: #333;
+        }
+        .error-code {
+            font-family: 'Courier New', monospace;
+        <form action="/api/payment/create" method="post">
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #ee5a6f;
+            word-break: break-all;
+        }
+        .help-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .help-section h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .help-section ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+        .help-section li {
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button, a {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(238, 90, 111, 0.3);
+        }
+        .btn-secondary {
+            background: white;
+            color: #ee5a6f;
+            border: 2px solid #ee5a6f;
+        }
+        .btn-secondary:hover {
+            background: #ee5a6f;
+            color: white;
+        }
+        .support-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+        .support-link a {
+            color: #ee5a6f;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0;
+            min-width: auto;
+        }
+        .support-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon"></div>
+
+        <h1>Lỗi thanh toán ⚠️</h1>
+        <p>Rất tiếc, đã xảy ra lỗi trong quá trình xử lý thanh toán của bạn.</p>
+
+        <div class="error-details">
+            <p><strong>Thông báo lỗi:</strong></p>
+            <div class="error-code" id="errorMessage">
+                Không thể kết nối với cổng thanh toán. Vui lòng thử lại sau.
+            </div>
+        </div>
+
+        <div class="help-section">
+            <h3>💡 Giải pháp khắc phục:</h3>
+            <ul>
+                <li>Kiểm tra kết nối internet của bạn</li>
+                <li>Đảm bảo thông tin thanh toán chính xác</li>
+                <li>Kiểm tra số dư tài khoản</li>
+                <li>Thử lại với phương thức thanh toán khác</li>
+                <li>Xóa cache và cookie trình duyệt</li>
+            </ul>
+        </div>
+
+        <div class="button-group">
+            <a href="/api/payment" class="btn-primary">Thử lại</a>
+            <a href="/api" class="btn-secondary">Về trang chủ</a>
+        </div>
+
+        <div class="support-link">
+            Cần hỗ trợ? <a href="/api/contact">Liên hệ với chúng tôi</a>
+        </div>
+    </div>
+
+    <script>
+        // Get error message from URL parameter if available
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMsg = urlParams.get('error');
+        const errorCode = urlParams.get('code');
+
+        if (errorMsg) {
+            let displayMsg = decodeURIComponent(errorMsg);
+            if (errorCode) {
+                displayMsg += ` (Mã lỗi: ${errorCode})`;
+            }
+            document.getElementById('errorMessage').textContent = displayMsg;
+        }
+
+        // Log error event
+        console.error('Payment error occurred at:', new Date().toLocaleString('vi-VN'));
+        if (errorMsg) console.error('Error message:', errorMsg);
+        if (errorCode) console.error('Error code:', errorCode);
+    </script>
+</body>
+</html>
+

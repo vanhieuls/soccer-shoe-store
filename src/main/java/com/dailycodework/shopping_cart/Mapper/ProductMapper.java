@@ -17,6 +17,7 @@ public interface ProductMapper {
     @Mapping(source = "id", target = "imageId")
     @Mapping(source = "fileName", target = "imageName")
     ImageDto imageDto(Image image);
+    @Mapping(source = "collection.name", target = "collectionId")
     @Mapping(target = "images", source = "images")
     ProductResponse toProductResponse (Product product);
     Product responseToProduct (ProductResponse product);

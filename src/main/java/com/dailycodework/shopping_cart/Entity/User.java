@@ -9,14 +9,16 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -31,24 +33,26 @@ public class User implements UserDetails {
     Long id;
     String firstName;
     String lastName;
-    @NotEmpty(message = "Please provide your phone number")
-    @Pattern(regexp = "^(0[0-9]{9})$", message = "Invalid phone number format")
+//    @NotEmpty(message = "Please provide your phone number")
+//    @Pattern(regexp = "^(0[0-9]{9}|\\*)$", message = "Invalid phone number format")
     String phone;
     String avatar;
     String permanentAddress; // địa chỉ thường trú
     String gender;
-    @NotEmpty(message = "Please provide your date of birth")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+//    @NotEmpty(message = "Please provide your date of birth")
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     String dateOfBirth;
-    @Email(message = "Please provide a valid email")
-    @NotEmpty(message = "Please provide an email")
+//    @Email(message = "Please provide a valid email")
+//    @NotEmpty(message = "Please provide an email")
     String email;
-    @NotEmpty(message = "Please provide your name")
+//    @NotEmpty(message = "Please provide your name")
     String username;
-    @Size(min = 5, message = "Your password must have at least 5 characters")
-    @NotEmpty(message = "Please provide your password")
+//    @Size(min = 5, message = "Your password must have at least 5 characters")
+//    @NotEmpty(message = "Please provide your password")
     String password;
+    boolean nonLocked;
     boolean checked;
+    boolean active;
     String verificationCode;
     LocalDateTime verificationExpiresAt;
     String resetPasswordToken;
@@ -68,9 +72,22 @@ public class User implements UserDetails {
     @ManyToMany(mappedBy = "users")
     Set<Voucher> vouchers; // Danh sách voucher đã sử dụng
     int pointVoucher; // Điểm tích lũy từ voucher
+    @CreationTimestamp
+    LocalDateTime createdAt;
+    @UpdateTimestamp
+    LocalDateTime updatedAt;
+//    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -80,7 +97,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return nonLocked;
     }
 
     @Override
@@ -92,4 +109,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }

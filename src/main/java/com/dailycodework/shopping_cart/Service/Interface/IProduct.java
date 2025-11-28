@@ -24,7 +24,7 @@ public interface IProduct {
     List<ProductResponse> getProductsByBrandAndName(String brand, String name);
     Long countProductsByBrandAndName(String brand, String name);
     Product createProduct (ProductRequest request);
-    Product updateProductExisted(ProductUpdateRequest request, Long id);
+    ProductResponse updateProductExisted(ProductUpdateRequest request, Long id);
 //    Page<ProductResponse> getProducts (Integer pageNumber, Integer pageSize, String properties,String sortDir,
 //                                                BigDecimal minPrice,
 //                                                BigDecimal maxPrice);
@@ -33,15 +33,6 @@ public interface IProduct {
                                        BigDecimal minPrice,
                                        BigDecimal maxPrice);
     Page<ProductResponse> getProductByFilter (ProductFilter filter);
-//public Page<ProductResponse> getProductByFilter(
-//        String category,
-//        String brand,
-//        BigDecimal priceMin,
-//        BigDecimal priceMax,
-//        String sort,
-//        String propertySort,
-//        Integer page,
-//        Integer size
-//);
-
+    Long countByDiscount();
+    List<ProductResponse> findTop10ByCreatedDesc();
 }

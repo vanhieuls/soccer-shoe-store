@@ -7,6 +7,7 @@ import com.dailycodework.shopping_cart.Entity.Size;
 import com.dailycodework.shopping_cart.Exception.AppException;
 import com.dailycodework.shopping_cart.Exception.ErrorCode;
 import com.dailycodework.shopping_cart.Service.Interface.ISize;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Size")
 public class SizeController {
     ISize iSizeService;
     @GetMapping("/get-all-size")

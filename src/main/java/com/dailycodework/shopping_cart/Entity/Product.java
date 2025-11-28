@@ -44,4 +44,5 @@ public class Product {
     @ManyToOne (fetch = FetchType.LAZY) //9/11
     @JoinColumn(name = "collection_id")
     Collections collection;
+    BigDecimal discount;
 }

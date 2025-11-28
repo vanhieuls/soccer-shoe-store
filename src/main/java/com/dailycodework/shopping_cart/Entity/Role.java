@@ -1,8 +1,7 @@
 package com.dailycodework.shopping_cart.Entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import com.dailycodework.shopping_cart.Enum.Roles;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,8 +17,9 @@ import java.util.Set;
 @Entity
 public class Role {
     @Id
-    String name;
+    @Enumerated(EnumType.STRING)
+    Roles name;
     String description;
-    @ManyToMany
-    Set<Permission> permissions = new HashSet<>();
+//    @ManyToMany
+//    Set<Permission> permissions = new HashSet<>();
 }

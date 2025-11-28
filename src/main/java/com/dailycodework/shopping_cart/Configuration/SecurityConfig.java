@@ -8,6 +8,11 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -33,8 +38,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class SecurityConfig {
-    String [] PUBLIC_ENDPOINT ={"/auth/**","/auth/signup","/auth/login","/auth/logout","/auth/refresh","/products/**","/user/create","/login","/login/**","/product-size/**","/size/**","/cartItem/**","/cartItem/remove-cartItem/**",
-            "/category/getall","/user/getUser","/products/get-products/**","/products/get-products/filter/**","/collection/get-collection-by-id/**","/collection/get-all","/collection/get-all-products-by-collection-id/**","/payment/confirm-webhook","/payment/payos_transfer_handler"};
+    String [] PUBLIC_ENDPOINT ={"/oauth2/authorization/google","/auth/**","/auth/signup","/auth/login","/auth/logout","/auth/refresh","/products/**","/user/create","/login","/login/**","/product-size/**","/size/**","/cartItem/**","/cartItem/remove-cartItem/**",
+            "/category/getall","/user/getUser","/products/get-products/**","/products/get-products/filter/**",
+            "/collection/get-collection-by-id/**","/collection/get-all","/collection/get-all-products-by-collection-id/**","/payment/confirm-webhook","/payment/payos_transfer_handler",
+            "/review/getList/**","/payment/create-payment-link","/payment/**","/payments/**","payment/paypal/execute","payment/paypal/create"};
     JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     JwtAuthenticationFilter jwtAuthenticationFilter;
     UserDetailsService userDetailsService;
@@ -42,6 +49,25 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder(10);
+    }
+    @Bean
+    public ThreadPoolTaskScheduler threadPoolTaskScheduler(){
+        return new ThreadPoolTaskScheduler();
+    }
+    @Bean
+    static RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("ADMIN").implies("STAFF")
+                .role("STAFF").implies("USER")
+                .build();
+    }
+
+    // and, if using pre-post method security also add
+    @Bean
+    static MethodSecurityExpressionHandler methodSecurityExpressionHandler(RoleHierarchy roleHierarchy) {
+        DefaultMethodSecurityExpressionHandler expressionHandler = new DefaultMethodSecurityExpressionHandler();
+        expressionHandler.setRoleHierarchy(roleHierarchy);
+        return expressionHandler;
     }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -64,6 +90,8 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(o->o.requestMatchers(HttpMethod.POST,PUBLIC_ENDPOINT).permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINT).permitAll()
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                .requestMatchers("/swagger-ui/**",
+                        "/v3/api-docs/**").permitAll()
                 .requestMatchers(HttpMethod.DELETE, PUBLIC_ENDPOINT).permitAll()
 //                .requestMatchers("/api/auth/**", "/api/login").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/auth/resend-email").permitAll()

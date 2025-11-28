@@ -1,13 +1,17 @@
 package com.dailycodework.shopping_cart.Service.Interface;
 
 import com.dailycodework.shopping_cart.DTO.Dto.PaymentDto;
+import com.dailycodework.shopping_cart.Entity.Order;
+import com.dailycodework.shopping_cart.Enum.PaymentMethod;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.paypal.base.rest.PayPalRESTException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public interface IPayment {
@@ -15,6 +19,9 @@ public interface IPayment {
     ObjectNode confirmWebhook(Map<String, String> requestBody);
     ObjectNode cancelOrder(int orderId);
     ObjectNode getOrderById(long orderId);
-    String Checkout(HttpServletRequest request, HttpServletResponse httpServletResponse, Long orderId, String method);
+    String Checkout(HttpServletRequest request, HttpServletResponse httpServletResponse, Long orderId, String paymentMethod);
     PaymentDto getPaymentById(Long Id);
+    com.paypal.api.payments.Payment createPaymentPayPal(Long orderId) throws PayPalRESTException;
+    com.paypal.api.payments.Payment executePayments(String paymentId, String payerId) throws PayPalRESTException;
+    String checkExcutePayment(Long orderId, String paymentId, String payerId) throws PayPalRESTException;
 }

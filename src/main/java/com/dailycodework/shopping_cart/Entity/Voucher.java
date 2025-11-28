@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.engine.internal.Cascade;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,7 +35,7 @@ public class Voucher {
     BigDecimal maxDiscountAmount; // ✅ Mức giảm tối đa (rất quan trọng)
      // Danh sách người dùng đã sử dụng voucher
     int pointRequired; // Số điểm cần thiết để sử dụng voucher
-    @ManyToMany
+    @ManyToMany (cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(
             name = "voucher_user",
             joinColumns = @JoinColumn(name = "voucher_id"),

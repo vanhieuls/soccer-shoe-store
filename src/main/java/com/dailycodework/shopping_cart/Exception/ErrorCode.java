@@ -32,7 +32,8 @@ public enum ErrorCode {
     SIZE_EMPTY(117,"Size empty", HttpStatus.BAD_REQUEST),
     INVALID_PASSWORD(112,"Old passwords do not correct", HttpStatus.BAD_REQUEST),
     INVALID_CONFIRM_PASSWORD(113,"New and confirm passwords do not match", HttpStatus.BAD_REQUEST),
-    TOKEN_RESET_PASSWORD_INVALID(114,"Token reset password expired", HttpStatus.BAD_REQUEST),
+    TOKEN_RESET_PASSWORD_EXPIRED(114,"Token reset password expired", HttpStatus.BAD_REQUEST),
+    TOKEN_RESET_PASSWORD_INVALID(115,"Token reset password invalid", HttpStatus.BAD_REQUEST),
     PRODUCT_SIZE_NOT_EXIST(115,"Product size not exist", HttpStatus.BAD_REQUEST),
     PRODUCT_SIZE_EXISTED(116,"Product size existed", HttpStatus.BAD_REQUEST),
     PRODUCT_SIZE_NOT_FOUND(118,"Product size not found", HttpStatus.NOT_FOUND),
@@ -53,7 +54,7 @@ public enum ErrorCode {
     VOUCHER_ALREADY_EXISTED_IN_USER(132,"Voucher already existed in user", HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(132,"Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(133,"You do not have permission to access this resource", HttpStatus.FORBIDDEN),
-    INAPPROPRIATE_CONTENT(134,"Inappropriate content in comment", HttpStatus.BAD_REQUEST),
+    INAPPROPRIATE_CONTENT(134,"Bình luận có chứa từ ngữ không chuẩn mực", HttpStatus.BAD_REQUEST),
     LINK_IN_COMMENT(135,"Link is not allowed in comment", HttpStatus.BAD_REQUEST),
     ORDER_AMOUNT_TOO_LOW(136,"Order amount is too low to apply voucher", HttpStatus.BAD_REQUEST),
     PAYMENT_NOT_FOUND(137,"Payment not found", HttpStatus.NOT_FOUND),
@@ -64,7 +65,15 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND(142,"Review not found", HttpStatus.NOT_FOUND),
     DO_NOT_HAVE_CART_ITEM_TO_CREATE_ORDER(143,"Do not have cart item to create order", HttpStatus.BAD_REQUEST),
     DO_NOT_HAVE_SELECTED_CART_ITEM_TO_CREATE_ORDER(144,"Do not have selected cart item to create order", HttpStatus.BAD_REQUEST),
-    ORDER_NOT_IN_CANCEL_REQUESTED_STATUS(145,"Order not in cancel requested status", HttpStatus.BAD_REQUEST),;
+    ORDER_NOT_IN_CANCEL_REQUESTED_STATUS(145,"Order not in cancel requested status", HttpStatus.BAD_REQUEST),
+    SCHEDULE_CONFIG_NOT_EXIST(146,"Cron not exist", HttpStatus.NOT_FOUND),
+    SCHEDULE_CONFIG_EXISTED(147,"Cron existed", HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN(148,"Invalid token", HttpStatus.BAD_REQUEST),
+    REDIS_REVOKED_TOKEN(149,"Token has been revoked", HttpStatus.UNAUTHORIZED),
+    ACCOUNT_LOCKED(150,"Account is locked", HttpStatus.UNAUTHORIZED),
+    INVALID_CREDENTIALS(151,"Invalid username or password", HttpStatus.UNAUTHORIZED),
+    PRODUCT_NOT_FOUND_IN_COLLECTION(152,"Product not found in collection", HttpStatus.NOT_FOUND),
+    PAYMENT_CREATION_FAILED(153,"Payment creation failed", HttpStatus.INTERNAL_SERVER_ERROR);
     private final int code;
     private final String message;
     private final HttpStatusCode httpStatusCode;

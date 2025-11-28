@@ -19,6 +19,8 @@ public class ReviewDto {
     Long id;
     Long productId;
     Long userId;
+    String username;
+    String avatarUser;
     int rating;
     String comment;
     LocalDateTime createAt;

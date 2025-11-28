@@ -8,16 +8,24 @@ import com.dailycodework.shopping_cart.DTO.Request.ChangePasswordRequest;
 import com.dailycodework.shopping_cart.DTO.Request.LoginRequest;
 import com.dailycodework.shopping_cart.DTO.Request.LogoutRequest;
 import com.dailycodework.shopping_cart.DTO.Request.UserRequest;
+import com.dailycodework.shopping_cart.DTO.Response.JwtInfo;
 import com.dailycodework.shopping_cart.DTO.Response.UserResponse;
 import com.dailycodework.shopping_cart.Entity.Cart;
+import com.dailycodework.shopping_cart.Entity.RedisToken;
+import com.dailycodework.shopping_cart.Entity.Role;
 import com.dailycodework.shopping_cart.Entity.User;
+import com.dailycodework.shopping_cart.Enum.Roles;
+import com.dailycodework.shopping_cart.Enum.TypeToken;
 import com.dailycodework.shopping_cart.Exception.AppException;
 import com.dailycodework.shopping_cart.Exception.ErrorCode;
 import com.dailycodework.shopping_cart.Mapper.UserMapper;
 import com.dailycodework.shopping_cart.Repository.CartRepository;
+import com.dailycodework.shopping_cart.Repository.RedisRepository;
+import com.dailycodework.shopping_cart.Repository.RoleRepository;
 import com.dailycodework.shopping_cart.Repository.UserRepository;
 import com.dailycodework.shopping_cart.Service.Interface.IAuthentication;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,8 +43,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+
+import static com.dailycodework.shopping_cart.Enum.TypeToken.ACCESS_TOKEN;
+import static com.dailycodework.shopping_cart.Enum.TypeToken.REFRESH_TOKEN;
+
 @Slf4j
 @Service
 @Builder
@@ -43,6 +55,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ImpAuthentication implements IAuthentication {
     UserMapper userMapper;
+    RoleRepository roleRepository;
     ImpEmail emailService;
     UserRepository userRepository;
     AuthenticationManager authenticationManager;
@@ -50,6 +63,7 @@ public class ImpAuthentication implements IAuthentication {
     PasswordEncoder passwordEncoder;
     CartRepository cartRepository;
     ImpCart cartService;
+    RedisRepository redisRepository;
     @Override
     public AuthenticationDto login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
@@ -57,30 +71,57 @@ public class ImpAuthentication implements IAuthentication {
             throw new AppException(ErrorCode.ACCOUNT_NOT_VERIFY);
         }
         Authentication authentication;
-        authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(),request.getPassword()));
-        if(authentication.isAuthenticated()){
-            log.info("User {} logged in successfully",authentication.getAuthorities());
-            log.info("Pr {} logged in successfully",authentication.getPrincipal());
-            log.info(" {} logged in successfully",authentication.getCredentials());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            String accessToken = jwtTokenProvider.generateToken(userDetails);
-            String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
-            return AuthenticationDto.builder()
-                    .authentication(true)
-                    .token(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+        try {
+            authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+//            if (authentication.isAuthenticated()) {
+                log.info("Login success, generate tokennnnnnnnnnnnn");
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                user.setActive(true);
+                userRepository.save(user);
+                String accessToken = jwtTokenProvider.generateToken(userDetails);
+                String refreshToken = jwtTokenProvider.generateRefreshToken(userDetails);
+                log.info("Login success, generate token");
+                return AuthenticationDto.builder()
+                        .authentication(true)
+                        .token(accessToken)
+                        .refreshToken(refreshToken)
+                        .build();
+//            } else {
+//                throw new UsernameNotFoundException("Invalids credentials");
+//            }
         }
-        else{
-            throw new UsernameNotFoundException("Invalids credentials");
+        catch (LockedException e) {
+            // tài khoản bị khóa
+            throw new AppException(ErrorCode.ACCOUNT_LOCKED);
+        }
+        catch (Exception e) {
+            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
         }
     }
 
     @Override
-    public String logout(LogoutRequest request) {
-        return "";
-    }
+        public void logout(String token) {
+            if(!jwtTokenProvider.validateToken(token,ACCESS_TOKEN)){
+                throw new AppException(ErrorCode.INVALID_TOKEN);
+            }
+            String username = jwtTokenProvider.extractUsername(token, ACCESS_TOKEN);
+            User user = userRepository.findByUsername(username).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+            user.setActive(false);
+            userRepository.save(user);
+            JwtInfo jwtInfo = jwtTokenProvider.parseToken(token, ACCESS_TOKEN);
+            long ttlMs = jwtInfo.getExpiredTime().getTime() - System.currentTimeMillis();
+            if(ttlMs <=0){
+                throw new RuntimeException("Token already expired");
+            }
+            RedisToken redisToken = RedisToken.builder()
+                    .jwtId(jwtInfo.getJwtId())
+    //                TTL trong redis nên bằng thời gian hết hạn trừ cho thời gian hiện tại
+                    .expiredTime(ttlMs)
+                    .build();
+            redisRepository.save(redisToken);
+            log.info("Logout success, save token to redis");
+        }
 
     @Override
     public UserResponse signUp(UserRequest request) {
@@ -90,10 +131,16 @@ public class ImpAuthentication implements IAuthentication {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
+        Set<Role> roles = new HashSet<>();
+        Role entity =
+                Role.builder().name(Roles.valueOf(Roles.ROLE_USER.name())).build();
+        roles.add(entity);
         User user = userMapper.toUser(request);
         user.setVerificationCode(generateVerifyCode());
         user.setVerificationExpiresAt(LocalDateTime.now().plusMinutes(15));
         user.setChecked(false);
+        user.setNonLocked(true);
+        user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         Cart cart = Cart.builder()
                 .user(user)
@@ -200,10 +247,10 @@ public class ImpAuthentication implements IAuthentication {
         User user = userRepository.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
         String resetToken = generateToken();
         user.setResetPasswordToken(resetToken);
-        user.setVerificationExpiresAt(LocalDateTime.now().plusMinutes(15));
+        user.setResetPasswordExpiry(LocalDateTime.now().plusMinutes(15));
         userRepository.save(user);
         // Gửi email với link đặt lại mật khẩu
-        String resetLink = "http://yourwebsite.com/reset-password?token=" + resetToken;
+        String resetLink = "http://localhost:5173/reset-password/?token=" + resetToken;
         String htmlMessage = "<!DOCTYPE html>\n" +
                 "<html>\n" +
                 "<head>\n" +
@@ -259,12 +306,34 @@ public class ImpAuthentication implements IAuthentication {
     public void resetPassword(ResetPassword resetPassword) {
         User user = userRepository.findByResetPasswordToken(resetPassword.token()).orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
         if(user.getResetPasswordExpiry().isBefore(LocalDateTime.now())){
-            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_INVALID);
+            throw new AppException(ErrorCode.TOKEN_RESET_PASSWORD_EXPIRED);
         }
         user.setPassword(passwordEncoder.encode(resetPassword.newPassword()));
         user.setResetPasswordToken(null);
         user.setResetPasswordExpiry(null);
         userRepository.save(user);
+    }
+
+    @Override
+    public AuthenticationDto refreshToken(HttpServletRequest request) {
+        String refreshToken = request.getHeader("RefreshToken");
+        log.info("RefreshToken: {}", refreshToken);
+        if(refreshToken == null || refreshToken.isBlank()){
+            throw new RuntimeException("Refresh token is missing");
+        }
+        if(!jwtTokenProvider.validateToken(refreshToken, REFRESH_TOKEN)){
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+        String username = jwtTokenProvider.extractUsername(refreshToken, REFRESH_TOKEN);
+        UserDetails userDetails = userRepository.findByUsername(username)
+                .orElseThrow(()->new AppException(ErrorCode.USER_NOT_FOUND));
+        String newAccessToken = jwtTokenProvider.generateToken(userDetails);
+        log.info("New AccessToken: {}", newAccessToken);
+        return AuthenticationDto.builder()
+                .authentication(true)
+                .token(newAccessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     private String generateToken() {

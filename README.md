@@ -14,7 +14,7 @@
 ### 🎯 Giao diện Admin
 
 #### Dashboard Admin
-![Dashboard](image1)
+![Dashboard](./screenshots/admin-dashboard.png)
 *Dashboard thống kê tổng quan doanh thu, đơn hàng theo tháng năm 2025*
 
 #### Biểu đồ doanh thu tích lũy

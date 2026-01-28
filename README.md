@@ -1,0 +1,541 @@
+# Soccer Shoe Store - Source Code Documentation
+
+## 📋 Giới thiệu
+
+Đây là dự án **Soccer Shoe Store** - Hệ thống quản lý cửa hàng bán giày bóng đá được xây dựng bằng **Spring Boot** với kiến trúc RESTful API. Dự án bao gồm các chức năng quản lý sản phẩm, đơn hàng, người dùng, thanh toán và nhiều tính năng khác.
+
+## 🌐 Live Demo
+
+- **🛍️ Giao diện người dùng (Customer)**: [https://vnhi-store.vercel.app](https://vnhi-store.vercel.app)
+- **👨‍💼 Giao diện quản trị (Admin)**: [https://admin-sport-store.vercel.app](https://admin-sport-store.vercel.app)
+
+## 🖼️ Giao diện hệ thống
+
+### 🎯 Giao diện Admin
+
+#### Dashboard Admin
+![Dashboard](image1)
+*Dashboard thống kê tổng quan doanh thu, đơn hàng theo tháng năm 2025*
+
+#### Biểu đồ doanh thu tích lũy
+![Revenue Chart](image2)
+*Biểu đồ doanh thu tích lũy theo từng tháng trong năm 2025*
+
+#### Quản lý đơn hàng
+![Order Management](image3)
+*Giao diện quản lý và theo dõi trạng thái đơn hàng*
+
+#### Chi tiết đơn hàng
+![Order Details](image4)
+*Thông tin chi ti���t đơn hàng bao gồm thông tin khách hàng, sản phẩm và thanh toán*
+
+#### Quản lý sản phẩm
+![Product Management](image5)
+*Giao diện quản lý sản phẩm với các tính năng sắp xếp, tìm kiếm và thao tác CRUD*
+
+#### Quản lý người dùng
+![User Management](image6)
+*Giao diện quản lý người dùng với thông tin tài khoản, trạng thái và ngày sinh*
+
+#### Quản lý Admin & Nhân viên
+![Admin & Staff Management](image7)
+*Giao diện quản lý tài khoản quản trị viên và nhân viên hệ thống*
+
+#### Quản lý Bộ Sưu Tập
+![Collection Management](image8)
+*Giao diện quản lý các bộ sưu tập sản phẩm như SELECTAL VICTORY PACK, AUDACITY PACK, FUTSAL BOOT, PRISM PACK*
+
+#### Quản lý Voucher
+![Voucher Management](image9)
+*Giao diện quản lý voucher giảm giá với thông tin mã, phần trăm giảm, điểm yêu cầu, thời gian và trạng thái*
+
+#### Chỉnh sửa Voucher
+![Edit Voucher](image10)
+*Form chỉnh sửa thông tin voucher bao gồm mã, giá trị giảm, giới hạn sử dụng, điểm yêu cầu và ngày hết hạn*
+
+#### Cập nhật trạng thái đơn hàng
+![Update Order Status](image11)
+*Modal cập nhật trạng thái đơn hàng với các tùy chọn trạng thái giao hàng (SHIPPING, DELIVERED, CANCELLED)*
+
+### 🛒 Giao diện Người dùng (Customer)
+
+#### Trang chủ
+![Homepage](image12)
+*Trang chủ với banner quảng cáo giày đá bóng sân cỏ nhân tạo từ các thương hiệu Nike, Adidas, Puma, Mizuno, Joma, Lotto, Zocker*
+
+#### Trang sản phẩm
+![Products Page](image13)
+*Trang danh sách sản phẩm với bộ lọc theo danh mục, giá, thương hiệu, khuyến mãi và đánh giá. Hiển thị 12 sản phẩm với giá và nút thêm vào giỏ*
+
+#### Chi tiết sản phẩm
+![Product Detail](image14)
+*Trang chi tiết sản phẩm ADIDAS PREDATOR 25 LEAGUE với hình ảnh, giá 2.000đ, chọn kích thước (39-50), số lượng, nút thêm giỏ hàng và mua ngay, có nút chia sẻ mạng xã hội*
+
+#### Giỏ hàng
+![Shopping Cart](image15)
+*Giỏ hàng hiển thị sản phẩm đã chọn, số lượng, giá, tạm tính, phí vận chuyển (20.000đ), tổng cộng (22.000đ) và nút tiến hành thanh toán*
+
+#### Quản lý đơn hàng của khách
+![Customer Orders](image16)
+*Trang quản lý đơn hàng cá nhân với các tab: Chờ xác nhận, Chờ xác nhận hủy, Đã xác nhận, Đang xử lý, Đang giao, Lịch sử đơn hàng. Popup chi tiết đơn hàng hiển thị mã đơn, ngày đặt, phí vận chuyển, ghi chú, sản phẩm và tổng cộng*
+
+#### Thanh toán
+![Checkout](image17)
+*Trang thanh toán với các bước: Trang chủ → Giỏ hàng → Thanh toán → Xác nhận thanh toán. Hiển thị tóm tắt đơn hàng, địa chỉ giao hàng, voucher khả dụng (SPRING2025, SUMMER2208, MPB2025), phương thức thanh toán và tổng tiền 22.000đ*
+
+#### Thanh toán PayPal
+![PayPal Payment](image18)
+*Trang thanh toán PayPal sandbox với địa chỉ giao hàng tới Hiếu Nguyễn, TP HCM. Hiển thị số tiền $0.88, các phương thức thanh toán: PayPal balance, Visa ****8578, và nút "Continue to Review Order"*
+
+#### Thông tin cá nhân
+![User Profile](image19)
+*Trang thông tin cá nhân hiển thị avatar, tên "Hieu Van", email vanhieuls7@gmail.com, nút "Chỉnh sửa thông tin". Các thông tin chi tiết: Tên đăng nhập (hieu@1234), Họ và tên (Hieu Van), Giới tính (Nam), Ngày sinh, Email (vanhieuls7@gmail.com), Số điện thoại (0123456789), Địa chỉ (Đặc Khu Ủy Sơn)*
+
+#### Chia sẻ sản phẩm lên Facebook
+![Share to Facebook](image20)
+*Modal chia sẻ sản phẩm ADIDAS F50 PRO TF - JH7664 - CAM/XANH giá 2.000.000đ lên Facebook. Hiển thị hình ảnh sản phẩm, caption "Chúng ơi, bạn đánh giá gì thế?", nút "Thêm vào bài viết của của bạn" và nút "Tiếp" màu xanh*
+
+#### Voucher của người dùng
+![User Vouchers](image21)
+*Trang "Voucher Của Bạn" với tiêu đề "Đổi điểm tích lũy để nhận ưu đãi hấp dẫn". Card "Voucher của bạn" hiển thị điểm tích lũy: 128 điểm. Có 2 tab: "Voucher Có Thể Đổi" (trống) và "Voucher Của Tôi" hiển thị SUMMER2025 (giảm 40%, từ 500.000đ, NSX: 2025-12-30, HSD: 2025-08-01, còn hạn 0/15) và SUMMER2208 (giảm 20%, từ 500.000đ, số hữu)*
+
+## 🏗️ Cấu trúc thư mục
+
+```
+src/
+├── main/
+│   ├── java/com/dailycodework/shopping_cart/
+│   │   ├── Configuration/      # Cấu hình ứng dụng
+│   │   ├── Controller/          # REST API Controllers
+│   │   ├── DTO/                 # Data Transfer Objects
+│   │   ├── Data/                # Dữ liệu khởi tạo
+│   │   ├── Entity/              # JPA Entities
+│   │   ├── Enum/                # Enumerations
+│   │   ├── Exception/           # Exception Handling
+│   │   ├── Helper/              # Các class hỗ trợ
+│   │   ├── Mapper/              # MapStruct Mappers
+│   │   ├── Repository/          # JPA Repositories
+│   │   ├── Service/             # Business Logic
+│   │   ├── Validation/          # Custom Validators
+│   │   └── ShoppingCartApplication.java
+│   └── resources/
+│       ├── templates/           # HTML Templates
+│       ├── static/              # Static resources
+│       └── application.properties
+└── test/                        # Unit Tests
+```
+
+## 📦 Chi tiết các package
+
+### 1. **Configuration**
+Chứa các file cấu hình Spring Boot:
+- **ApplicationConfig.java**: Cấu hình chung cho ứng dụng, khởi tạo admin user
+- **WebConfig.java**: Cấu hình CORS, interceptors
+- **SecurityConfig**: Cấu hình bảo mật JWT
+
+### 2. **Controller**
+REST API endpoints:
+- **AuthenticationController**: Đăng nhập, đăng ký, đăng xuất
+- **CategoryController**: Quản lý danh mục sản phẩm
+- **ProductController**: Quản lý sản phẩm
+- **OrderController**: Quản lý đơn hàng
+- **UserController**: Quản lý người dùng
+- **VoucherController**: Quản lý voucher giảm giá
+- **AddressController**: Quản lý địa chỉ giao hàng
+- **ImageController**: Upload và quản lý hình ảnh
+- **CollectionController**: Quản lý bộ sưu tập sản phẩm
+- **TestController**: Test thanh toán PayPal
+
+### 3. **DTO (Data Transfer Objects)**
+```
+DTO/
+├── Dto/                 # DTOs chung
+├── Request/             # Request DTOs
+└── Response/            # Response DTOs
+    └── ApiResponse.java # Cấu trúc response chuẩn
+```
+
+**ApiResponse Structure:**
+```java
+{
+    "code": 100,
+    "message": "Success",
+    "result": { ... }
+}
+```
+
+### 4. **Entity**
+JPA Entities ánh xạ với database:
+- **User**: Thông tin người dùng
+- **Product**: Sản phẩm
+- **Category**: Danh mục
+- **Order**: Đơn hàng
+- **OrderItem**: Chi tiết đơn hàng
+- **Cart**: Giỏ hàng
+- **Voucher**: Phiếu giảm giá
+- **Address**: Địa chỉ
+- **Review**: Đánh giá sản phẩm
+- **Role**: Vai trò người dùng
+- **Collection**: Bộ sưu tập sản phẩm
+
+### 5. **Enum**
+Các hằng số enum:
+
+#### **Roles.java**
+```java
+public enum Roles {
+    ROLE_ADMIN,   // Quản trị viên
+    ROLE_USER,    // Khách hàng
+    ROLE_STAFF    // Nhân viên
+}
+```
+
+#### **OderStatus.java**
+```java
+public enum OderStatus {
+    PENDING,           // Chờ xử lý
+    CONFIRMED,         // Đã xác nhận
+    PROCESSING,        // Đang xử lý
+    SHIPPING,          // Đang giao hàng
+    DELIVERED,         // Đã giao
+    CANCELLED,         // Đã hủy
+    CANCEL_REQUESTED   // Yêu cầu hủy
+}
+```
+
+#### **PaymentStatus.java**
+```java
+public enum PaymentStatus {
+    UNPAID,   // Chưa thanh toán
+    PAID,     // Đã thanh toán
+    FAILED    // Thất bại
+}
+```
+
+### 6. **Exception**
+Xử lý exception tập trung:
+- **ErrorCode.java**: Định nghĩa các mã lỗi
+- **GlobalExceptionHandler**: Xử lý exception toàn cục
+- **AppException**: Custom exception class
+
+**Error Codes Sample:**
+```java
+PRODUCT_NOT_EXIST (100,"Product not exist", HttpStatus.NOT_FOUND)
+USER_NOT_FOUND (101,"User not found", HttpStatus.NOT_FOUND)
+VOUCHER_EXPIRED(129,"Voucher expired", HttpStatus.BAD_REQUEST)
+ACCOUNT_LOCKED(150,"Account is locked", HttpStatus.UNAUTHORIZED)
+```
+
+### 7. **Helper**
+Các class tiện ích:
+- **ProfanityFilter**: Lọc từ ngữ nhạy cảm trong review/comment
+  - Chặn các từ tục tĩu (tiếng Việt & tiếng Anh)
+  - Chặn link đến các trang thương mại điện tử khác
+  - Chặn link rút gọn và spam
+- **JwtUtil**: Xử lý JWT token
+- **EmailService**: Gửi email
+
+### 8. **Mapper**
+MapStruct mappers để chuyển đổi giữa Entity và DTO:
+- **UserMapper**: User ↔ UserRequest/UserResponse
+- **ProductMapper**: Product ↔ ProductDTO
+- **OrderMapper**: Order ↔ OrderDTO
+- **ReviewMapper**: Review ↔ ReviewDTO
+- **VoucherMapper**: Voucher ↔ VoucherDTO
+
+### 9. **Repository**
+JPA Repositories:
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
+    long countNewUsersByCreatedAtBetween(String startDate, String endDate);
+    long countUsersIsActive();
+}
+```
+
+### 10. **Service**
+Business logic layer:
+```
+Service/
+├── Interface/           # Service interfaces
+│   ├── IUser
+│   ├── IProduct
+│   ├── IOrder
+│   ├── IVoucher
+│   ├── IAddress
+│   └── ...
+└── ImpInterface/        # Service implementations
+    ├── ImpUser
+    ├── ImpProduct
+    ├── ImpOrder
+    ├── ImpPayment       # PayPal integration
+    ├── ImpVoucher
+    └── ...
+```
+
+### 11. **Validation**
+Custom validators:
+- Email validation
+- Phone number validation
+- Password strength validation
+- Date validation
+
+## 🔐 Authentication & Authorization
+
+### JWT Token Flow
+1. User đăng nhập → Nhận Access Token & Refresh Token
+2. Mỗi request gửi kèm `Authorization: Bearer {token}`
+3. Token được validate qua Security Filter
+4. Phân quyền dựa trên Role (ADMIN/USER/STAFF)
+
+### Security Endpoints
+```
+POST /auth/login       - Đăng nhập
+POST /auth/signup      - Đăng ký
+POST /auth/logout      - Đăng xuất
+PUT  /auth/resend-email - Gửi lại email xác thực
+```
+
+## 💳 Payment Integration
+
+### PayPal Integration
+- **ImpPayment.java**: Service xử lý thanh toán PayPal
+- Support methods: PayPal, Credit Card
+- Flow: Create Payment → Execute Payment → Verify
+- Sandbox mode cho development
+- Chuyển đổi tỷ giá VND sang USD tự động
+
+### Payment Endpoints
+```
+GET  /payments/           - Payment form
+POST /payments/create     - Tạo payment
+GET  /payments/success    - Payment success callback
+GET  /payments/cancel     - Payment cancel callback
+GET  /payments/error      - Payment error callback
+```
+
+### Payment Methods
+- **COD (Cash on Delivery)**: Thanh toán khi nhận hàng
+- **PAYOS**: Cổng thanh toán trực tuyến
+- **PayPal**: Thanh toán quốc tế
+
+## 📊 Features
+
+### 1. Quản lý sản phẩm
+- CRUD sản phẩm
+- Upload nhiều ảnh
+- Quản lý danh mục
+- Tìm kiếm, lọc, sắp xếp sản phẩm
+- Quản lý kích thước và số lượng tồn kho
+- Quản lý thương hiệu (Adidas, Nike, Puma, Mizuno, Joma, Lotto, Zocker)
+- Chia sẻ sản phẩm lên Facebook
+
+### 2. Quản lý đơn hàng
+- Tạo đơn hàng
+- Theo dõi trạng thái (Pending → Confirmed → Processing → Shipping → Delivered)
+- Cập nhật trạng thái đơn
+- Hủy đơn hàng / Yêu cầu hủy đơn
+- Xem lịch sử đơn hàng
+- Thống kê đơn hàng theo trạng thái
+- Tìm kiếm đơn hàng theo mã, ngày
+
+### 3. Hệ thống voucher
+- Tạo mã giảm giá (%, số tiền cố định)
+- Áp dụng voucher cho đơn hàng
+- Kiểm tra hợp lệ (thời hạn, số lượng, điều kiện)
+- Quản lý số lượng sử dụng
+- Voucher theo người dùng
+- **Đổi điểm tích lũy lấy voucher**
+- Hiển thị voucher có thể đổi và voucher đã sở hữu
+- Theo dõi số lượng voucher đã dùng/tổng số
+
+### 4. Đánh giá sản phẩm
+- Đánh giá 1-5 sao
+- Comment review
+- Lọc từ ngữ nhạy cảm tự động
+- Chặn link spam
+
+### 5. Quản lý người dùng
+- Quản lý khách hàng
+- Quản lý Admin & Staff
+- Khóa/Mở khóa tài khoản
+- Xác thực email
+- Phân quyền theo Role
+- Tìm kiếm người dùng
+- Hệ thống điểm tích lũy
+
+### 6. Quản lý Bộ Sưu Tập
+- Tạo và quản lý các bộ sưu tập sản phẩm
+- Thêm/Xóa sản phẩm khỏi bộ sưu tập
+- Hiển thị mô tả bộ sưu tập
+- Các bộ sưu tập: SELECTAL VICTORY PACK, AUDACITY PACK, FUTSAL BOOT, PRISM PACK
+
+### 7. Thống kê & Báo cáo
+- Dashboard doanh thu
+- Biểu đồ theo tháng/năm
+- Sản phẩm bán chạy
+- Thống kê khách hàng mới
+- Doanh thu tích lũy
+
+### 8. Social Integration
+- Chia sẻ sản phẩm lên Facebook
+- Share sản phẩm trên LinkedIn, Twitter
+- Tích h��p các nút social share
+
+## 🛠️ Technologies
+
+- **Framework**: Spring Boot 3.x
+- **Database**: MySQL/PostgreSQL
+- **Cache**: Redis
+- **Security**: Spring Security + JWT
+- **ORM**: Hibernate/JPA
+- **Mapping**: MapStruct
+- **Payment**: PayPal SDK
+- **Email**: JavaMailSender
+- **Validation**: Hibernate Validator
+- **Cloud Storage**: Cloudinary (Image upload)
+- **Documentation**: Swagger/OpenAPI
+- **Deployment**: Vercel (Frontend), Railway/Render (Backend)
+
+## 🚀 Getting Started
+
+### Prerequisites
+```bash
+- Java 17+
+- Maven 3.8+
+- MySQL 8.0+
+- Redis Server
+- Node.js 18+ (for frontend)
+```
+
+### Configuration
+Cấu hình trong `application.properties`:
+```properties
+# Database
+spring.datasource.url=jdbc:mysql://localhost:3306/soccer_store
+spring.datasource.username=root
+spring.datasource.password=your_password
+
+# JWT
+jwt.secret=your-secret-key
+jwt.expiration=86400000
+
+# PayPal
+paypal.mode=sandbox
+paypal.client.id=your-client-id
+paypal.client.secret=your-client-secret
+
+# Redis
+spring.redis.host=localhost
+spring.redis.port=6379
+
+# Cloudinary
+cloudinary.cloud-name=your-cloud-name
+cloudinary.api-key=your-api-key
+cloudinary.api-secret=your-api-secret
+```
+
+### Run Application
+```bash
+# Clone repository
+git clone https://github.com/vanhieuls/soccer-shoe-store.git
+
+# Navigate to project
+cd soccer-shoe-store
+
+# Install dependencies
+mvn clean install
+
+# Run application
+mvn spring-boot:run
+```
+
+Application chạy tại: `http://localhost:8080`
+
+### Deploy to Vercel
+
+Frontend được deploy lên Vercel:
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel --prod
+```
+
+## 📝 API Documentation
+
+Swagger UI: `http://localhost:8080/swagger-ui.html`
+
+### Example API Calls
+
+#### Login
+```bash
+POST /auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "admin123"
+}
+```
+
+#### Get Products with Pagination
+```bash
+GET /api/products?page=0&size=10&sortBy=name&sortDir=asc
+Authorization: Bearer {token}
+```
+
+#### Create Order
+```bash
+POST /api/orders
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "items": [
+        {
+            "productId": 1,
+            "quantity": 2,
+            "size": "42"
+        }
+    ],
+    "addressId": 1,
+    "voucherCode": "SALE10"
+}
+```
+
+#### Apply Voucher
+```bash
+POST /api/vouchers/addVoucher/{userId}/{voucherId}
+Authorization: Bearer {token}
+```
+
+#### Get User Vouchers
+```bash
+GET /api/vouchers/getVouchersByUserId/{userId}
+Authorization: Bearer {token}
+```
+
+## 👥 Default Accounts
+
+Sau khi chạy application lần đầu:
+
+| Username | Password | Role |
+|----------|----------|------|
+| admin | admin123 | ROLE_ADMIN |
+
+## 📧 Contact & Support
+
+- Developer: VanHieu
+- Email: vanhieuls7@gmail.com
+- Repository: https://github.com/vanhieuls/soccer-shoe-store
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+**Last Updated**: January 2026

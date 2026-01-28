@@ -14,89 +14,111 @@
 ### 🎯 Giao diện Admin
 
 #### Dashboard Admin
-![Dashboard](./screenshots/admin-dashboard.png)
+<img width="915" height="436" alt="image" src="https://github.com/user-attachments/assets/48e780bc-4507-480c-9cc5-70fc8b5fee48" />
+
 *Dashboard thống kê tổng quan doanh thu, đơn hàng theo tháng năm 2025*
 
 #### Biểu đồ doanh thu tích lũy
-![Revenue Chart](image2)
+<img width="915" height="464" alt="image" src="https://github.com/user-attachments/assets/8ae5b2ee-2679-4ba1-829b-58d7cb132ead" />
+
 *Biểu đồ doanh thu tích lũy theo từng tháng trong năm 2025*
 
 #### Quản lý đơn hàng
-![Order Management](image3)
+<img width="915" height="437" alt="image" src="https://github.com/user-attachments/assets/7ca4c553-f133-4e9c-a919-3e73a206c204" />
+
 *Giao diện quản lý và theo dõi trạng thái đơn hàng*
 
 #### Chi tiết đơn hàng
-![Order Details](image4)
+<img width="915" height="461" alt="image" src="https://github.com/user-attachments/assets/7fad4404-089b-4698-a2e6-49004e238941" />
+
 *Thông tin chi ti���t đơn hàng bao gồm thông tin khách hàng, sản phẩm và thanh toán*
 
 #### Quản lý sản phẩm
-![Product Management](image5)
+<img width="915" height="464" alt="image" src="https://github.com/user-attachments/assets/d7e7178b-0ae0-4254-9bbf-e291f2b9208f" />
+
 *Giao diện quản lý sản phẩm với các tính năng sắp xếp, tìm kiếm và thao tác CRUD*
 
 #### Quản lý người dùng
-![User Management](image6)
+<img width="915" height="465" alt="image" src="https://github.com/user-attachments/assets/d4646674-8aa2-48af-8098-0a5b0949d2db" />
+
 *Giao diện quản lý người dùng với thông tin tài khoản, trạng thái và ngày sinh*
 
 #### Quản lý Admin & Nhân viên
-![Admin & Staff Management](image7)
+<img width="915" height="460" alt="image" src="https://github.com/user-attachments/assets/f015569d-c5b2-4850-bafd-0340593ca35c" />
+
 *Giao diện quản lý tài khoản quản trị viên và nhân viên hệ thống*
 
 #### Quản lý Bộ Sưu Tập
-![Collection Management](image8)
+<img width="915" height="434" alt="image" src="https://github.com/user-attachments/assets/c570a2bb-081c-43b8-a831-c06a59c4456e" />
+
 *Giao diện quản lý các bộ sưu tập sản phẩm như SELECTAL VICTORY PACK, AUDACITY PACK, FUTSAL BOOT, PRISM PACK*
 
 #### Quản lý Voucher
-![Voucher Management](image9)
+<img width="915" height="435" alt="image" src="https://github.com/user-attachments/assets/e4f2fab6-f7a1-4572-843a-836978f8b5a6" />
+
 *Giao diện quản lý voucher giảm giá với thông tin mã, phần trăm giảm, điểm yêu cầu, thời gian và trạng thái*
 
 #### Chỉnh sửa Voucher
-![Edit Voucher](image10)
+<img width="915" height="434" alt="image" src="https://github.com/user-attachments/assets/52878a32-fe27-4eb4-a26a-535fad7f74d8" />
+
 *Form chỉnh sửa thông tin voucher bao gồm mã, giá trị giảm, giới hạn sử dụng, điểm yêu cầu và ngày hết hạn*
 
 #### Cập nhật trạng thái đơn hàng
-![Update Order Status](image11)
+<img width="915" height="466" alt="image" src="https://github.com/user-attachments/assets/65f925c1-d27b-4e5a-b0d0-aa5c2d581ab5" />
+
 *Modal cập nhật trạng thái đơn hàng với các tùy chọn trạng thái giao hàng (SHIPPING, DELIVERED, CANCELLED)*
 
 ### 🛒 Giao diện Người dùng (Customer)
 
 #### Trang chủ
-![Homepage](image12)
+<img width="915" height="465" alt="image" src="https://github.com/user-attachments/assets/8713a799-0e58-48a1-b168-f69f7ae6df7a" />
+
 *Trang chủ với banner quảng cáo giày đá bóng sân cỏ nhân tạo từ các thương hiệu Nike, Adidas, Puma, Mizuno, Joma, Lotto, Zocker*
 
 #### Trang sản phẩm
-![Products Page](image13)
+<img width="915" height="437" alt="image" src="https://github.com/user-attachments/assets/166d4be8-3433-4f01-a3af-b26def1b98cf" />
+
 *Trang danh sách sản phẩm với bộ lọc theo danh mục, giá, thương hiệu, khuyến mãi và đánh giá. Hiển thị 12 sản phẩm với giá và nút thêm vào giỏ*
 
 #### Chi tiết sản phẩm
-![Product Detail](image14)
+<img width="915" height="462" alt="image" src="https://github.com/user-attachments/assets/38a56f38-93aa-4f85-93af-5af5b4021a39" />
+
 *Trang chi tiết sản phẩm ADIDAS PREDATOR 25 LEAGUE với hình ảnh, giá 2.000đ, chọn kích thước (39-50), số lượng, nút thêm giỏ hàng và mua ngay, có nút chia sẻ mạng xã hội*
 
 #### Giỏ hàng
-![Shopping Cart](image15)
+<img width="915" height="436" alt="image" src="https://github.com/user-attachments/assets/d85bb53a-d03e-438d-bd7e-ee7abdd5bdd9" />
+
 *Giỏ hàng hiển thị sản phẩm đã chọn, số lượng, giá, tạm tính, phí vận chuyển (20.000đ), tổng cộng (22.000đ) và nút tiến hành thanh toán*
 
 #### Quản lý đơn hàng của khách
-![Customer Orders](image16)
+<img width="1877" height="992" alt="Screenshot 2026-01-28 111442" src="https://github.com/user-attachments/assets/24964afd-d0e3-4365-ab62-62db28a31367" />
+
+
 *Trang quản lý đơn hàng cá nhân với các tab: Chờ xác nhận, Chờ xác nhận hủy, Đã xác nhận, Đang xử lý, Đang giao, Lịch sử đơn hàng. Popup chi tiết đơn hàng hiển thị mã đơn, ngày đặt, phí vận chuyển, ghi chú, sản phẩm và tổng cộng*
 
 #### Thanh toán
-![Checkout](image17)
+<img width="915" height="508" alt="image" src="https://github.com/user-attachments/assets/f53774c8-89b1-4aed-860d-af7901a4f787" />
+
 *Trang thanh toán với các bước: Trang chủ → Giỏ hàng → Thanh toán → Xác nhận thanh toán. Hiển thị tóm tắt đơn hàng, địa chỉ giao hàng, voucher khả dụng (SPRING2025, SUMMER2208, MPB2025), phương thức thanh toán và tổng tiền 22.000đ*
 
 #### Thanh toán PayPal
-![PayPal Payment](image18)
+<img width="915" height="491" alt="image" src="https://github.com/user-attachments/assets/beceb715-ce19-4aeb-b81c-6ba60ad6b85c" />
+
 *Trang thanh toán PayPal sandbox với địa chỉ giao hàng tới Hiếu Nguyễn, TP HCM. Hiển thị số tiền $0.88, các phương thức thanh toán: PayPal balance, Visa ****8578, và nút "Continue to Review Order"*
 
 #### Thông tin cá nhân
-![User Profile](image19)
+<img width="915" height="433" alt="image" src="https://github.com/user-attachments/assets/38af36d2-e361-426a-a108-e4a8e9bd9de6" />
+
 *Trang thông tin cá nhân hiển thị avatar, tên "Hieu Van", email vanhieuls7@gmail.com, nút "Chỉnh sửa thông tin". Các thông tin chi tiết: Tên đăng nhập (hieu@1234), Họ và tên (Hieu Van), Giới tính (Nam), Ngày sinh, Email (vanhieuls7@gmail.com), Số điện thoại (0123456789), Địa chỉ (Đặc Khu Ủy Sơn)*
 
 #### Chia sẻ sản phẩm lên Facebook
-![Share to Facebook](image20)
+<img width="915" height="485" alt="image" src="https://github.com/user-attachments/assets/f2b46c11-2d7a-4040-966c-55610f8bd501" />
+
 *Modal chia sẻ sản phẩm ADIDAS F50 PRO TF - JH7664 - CAM/XANH giá 2.000.000đ lên Facebook. Hiển thị hình ảnh sản phẩm, caption "Chúng ơi, bạn đánh giá gì thế?", nút "Thêm vào bài viết của của bạn" và nút "Tiếp" màu xanh*
 
 #### Voucher của người dùng
-![User Vouchers](image21)
+<img width="915" height="465" alt="image" src="https://github.com/user-attachments/assets/1135b980-a589-4661-ac2b-50da25996f43" />
+
 *Trang "Voucher Của Bạn" với tiêu đề "Đổi điểm tích lũy để nhận ưu đãi hấp dẫn". Card "Voucher của bạn" hiển thị điểm tích lũy: 128 điểm. Có 2 tab: "Voucher Có Thể Đổi" (trống) và "Voucher Của Tôi" hiển thị SUMMER2025 (giảm 40%, từ 500.000đ, NSX: 2025-12-30, HSD: 2025-08-01, còn hạn 0/15) và SUMMER2208 (giảm 20%, từ 500.000đ, số hữu)*
 
 ## 🏗️ Cấu trúc thư mục
@@ -452,90 +474,5 @@ mvn spring-boot:run
 ```
 
 Application chạy tại: `http://localhost:8080`
-
-### Deploy to Vercel
-
-Frontend được deploy lên Vercel:
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
-```
-
-## 📝 API Documentation
-
-Swagger UI: `http://localhost:8080/swagger-ui.html`
-
-### Example API Calls
-
-#### Login
-```bash
-POST /auth/login
-Content-Type: application/json
-
-{
-    "username": "admin",
-    "password": "admin123"
-}
-```
-
-#### Get Products with Pagination
-```bash
-GET /api/products?page=0&size=10&sortBy=name&sortDir=asc
-Authorization: Bearer {token}
-```
-
-#### Create Order
-```bash
-POST /api/orders
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-    "items": [
-        {
-            "productId": 1,
-            "quantity": 2,
-            "size": "42"
-        }
-    ],
-    "addressId": 1,
-    "voucherCode": "SALE10"
-}
-```
-
-#### Apply Voucher
-```bash
-POST /api/vouchers/addVoucher/{userId}/{voucherId}
-Authorization: Bearer {token}
-```
-
-#### Get User Vouchers
-```bash
-GET /api/vouchers/getVouchersByUserId/{userId}
-Authorization: Bearer {token}
-```
-
-## 👥 Default Accounts
-
-Sau khi chạy application lần đầu:
-
-| Username | Password | Role |
-|----------|----------|------|
-| admin | admin123 | ROLE_ADMIN |
-
-## 📧 Contact & Support
-
-- Developer: VanHieu
-- Email: vanhieuls7@gmail.com
-- Repository: https://github.com/vanhieuls/soccer-shoe-store
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
 
 **Last Updated**: January 2026
